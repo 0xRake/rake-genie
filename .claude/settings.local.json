@@ -3,7 +3,12 @@
     "allow": [
       "Bash(npm run build:*)",
       "Bash(tree:*)",
-      "Bash(npx tsc:*)"
+      "Bash(npx tsc:*)",
+      "Bash(git commit:*)",
+      "Bash(gh repo:*)",
+      "Bash(vercel:*)",
+      "Bash(cat:*)",
+      "Bash(npm run lint:*)"
     ],
     "deny": [],
     "ask": []

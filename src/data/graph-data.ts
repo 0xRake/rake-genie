@@ -5,12 +5,17 @@ import {
   Target
 } from 'lucide-react';
 
+export interface IconProps {
+  size?: number;
+  className?: string;
+}
+
 export interface GraphNode {
   id: string;
   group: string;
   label: string;
   r: number;
-  icon?: React.ComponentType<any>;
+  icon?: React.ComponentType<IconProps>;
   desc?: string;
   utility?: string;
 }

@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useRef, useState, useEffect } from 'react';
 import { GROUP_ANCHORS } from '@/data/anchors';
 import { performanceMonitor } from '../utils/performanceMonitor';
 
@@ -20,20 +20,25 @@ export interface Link {
   type?: string;
 }
 
-export function usePhysics(nodes: Node[], links: Link[], externalPaused: boolean) {
+type SetNodesDispatch = React.Dispatch<React.SetStateAction<Node[]>>;
+
+export function usePhysics(_nodes: Node[], links: Link[], externalPaused: boolean) {
   const [physicsPaused, setPhysicsPaused] = useState(false);
   const lastPhysicsTimeRef = useRef<number>(0);
   const physicsIntervalRef = useRef<number>(33); // ~30fps
   const reqRef = useRef<number | undefined>(undefined);
 
-  const updatePhysics = useCallback((setNodes: React.Dispatch<React.SetStateAction<Node[]>>) => {
+  // Ref to store the latest updatePhysics callback for recursive calls
+  const updatePhysicsRef = useRef<((setNodes: SetNodesDispatch) => void) | null>(null);
+
+  const updatePhysics = useCallback((setNodes: SetNodesDispatch) => {
     const physicsStart = performance.now();
     const now = performance.now();
-    
+
     // Throttle to ~30fps (33ms intervals)
     if (now - lastPhysicsTimeRef.current < physicsIntervalRef.current) {
       if (!physicsPaused && !externalPaused) {
-        reqRef.current = requestAnimationFrame(() => updatePhysics(setNodes));
+        reqRef.current = requestAnimationFrame(() => updatePhysicsRef.current?.(setNodes));
       }
       return;
     }
@@ -131,9 +136,14 @@ export function usePhysics(nodes: Node[], links: Link[], externalPaused: boolean
     
     // Only continue animation if not paused (internal or external)
     if (!physicsPaused && !externalPaused) {
-      reqRef.current = requestAnimationFrame(() => updatePhysics(setNodes));
+      reqRef.current = requestAnimationFrame(() => updatePhysicsRef.current?.(setNodes));
     }
   }, [links, physicsPaused, externalPaused]);
+
+  // Keep the ref updated with the latest callback
+  useEffect(() => {
+    updatePhysicsRef.current = updatePhysics;
+  }, [updatePhysics]);
 
   return {
     physicsPaused,

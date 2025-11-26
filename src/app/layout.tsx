@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Intelium - Rake Presentation Workflow",
-  description: "Novel exploratory documentation format using neural-pathway knowledge graphs",
+  title: "Intelium",
+  description: "Formato de documentação exploratória usando grafos de conhecimento de vias neurais",
 };
 
 export default function RootLayout({
@@ -23,7 +23,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="dark">
+    <html lang="pt-BR" className="dark">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >

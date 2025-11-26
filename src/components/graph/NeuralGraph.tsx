@@ -14,27 +14,27 @@ import { GROUP_COLORS, GROUP_COLORS_DARK, GROUP_COLORS_LIGHT, MASTER_NODE_COLORS
 // Real-time metrics overlay showing business value
 const DemoMetrics = () => (
   <div className="absolute bottom-6 right-6 bg-black/80 backdrop-blur-sm border border-white/20 rounded-lg p-4 text-white max-w-sm z-20">
-    <h3 className="text-sm font-bold mb-3">Palantir + o9: Integration Value</h3>
+    <h3 className="text-sm font-bold mb-3">Palantir + o9: Valor da Integração</h3>
     <div className="space-y-2 text-xs">
       <div className="flex justify-between">
-        <span>ERP Systems Integrated:</span>
-        <span className="font-mono text-green-400">7 in 5 days</span>
+        <span>Sistemas ERP Integrados:</span>
+        <span className="font-mono text-green-400">7 em 5 dias</span>
       </div>
       <div className="flex justify-between">
-        <span>Data Unification:</span>
-        <span className="font-mono text-blue-400">Real-time</span>
+        <span>Unificação de Dados:</span>
+        <span className="font-mono text-blue-400">Tempo real</span>
       </div>
       <div className="flex justify-between">
-        <span>o9 Forecast Accuracy:</span>
+        <span>Precisão de Previsão o9:</span>
         <span className="font-mono text-green-400">70% → 85%+</span>
       </div>
       <div className="flex justify-between">
-        <span>Annual Savings:</span>
-        <span className="font-mono text-green-400">$50-100M</span>
+        <span>Economia Anual:</span>
+        <span className="font-mono text-green-400">R$250-500M</span>
       </div>
     </div>
     <p className="text-xs text-gray-400 mt-3 italic">
-      &quot;We don&apos;t replace o9. We complete o9.&quot;
+      &quot;Não substituímos o o9. Completamos o o9.&quot;
     </p>
   </div>
 );
@@ -42,14 +42,14 @@ const DemoMetrics = () => (
 // Group-specific story descriptions for demo narrative
 const getGroupStory = (group: string): string => {
   const stories: Record<string, string> = {
-    'os': 'Palantir Foundry Core - The Operating System',
-    'aip': 'AI-Powered Intelligence - Completes o9 Planning',
-    'ontology': 'Unified Data Model - What o9 Needs',
-    'data': 'ERP Integration - 7 Systems in 5 Days',
-    'app': 'Operational Applications - Real-Time Decisions',
-    'target': 'o9 Solutions - Planning Layer',
-    'source': 'SAP/Oracle - Source Systems',
-    'strategy': 'Supply Chain Strategy - End-to-End'
+    'os': 'Palantir Foundry Core - Sistema Operacional',
+    'aip': 'Inteligência com IA - Completa o Planejamento o9',
+    'ontology': 'Modelo de Dados Unificado - O Que o9 Precisa',
+    'data': 'Integração ERP - 7 Sistemas em 5 Dias',
+    'app': 'Aplicações Operacionais - Decisões em Tempo Real',
+    'target': 'Soluções o9 - Camada de Planejamento',
+    'source': 'SAP/Oracle - Sistemas Fonte',
+    'strategy': 'Estratégia da Cadeia de Suprimentos - End-to-End'
   };
   return stories[group] || group;
 };
@@ -89,7 +89,6 @@ export function NeuralGraph({
 }: NeuralGraphProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [nodes, setNodes] = useState<NeuralGraphNode[]>([]);
-  const [links, setLinks] = useState<Link[]>([]);
   const [dimensions, setDimensions] = useState({ width: 1000, height: 800 });
   const [isDragging, setIsDragging] = useState(false);
   const [lastMouse, setLastMouse] = useState({ x: 0, y: 0 });
@@ -98,17 +97,31 @@ export function NeuralGraph({
   const [isInitializing, setIsInitializing] = useState(true);
   const [physicsStabilized, setPhysicsStabilized] = useState(false);
 
-  const { camera, setCamera, handleMouseMove, handleWheel, resetCamera } = useCamera(onCameraChange);
-  
-  // Camera control functions for GraphControls
-  const zoomIn = useCallback(() => {
-    handleWheel(-50);
-  }, [handleWheel]);
-  
-  const zoomOut = useCallback(() => {
-    handleWheel(50);
-  }, [handleWheel]);
-  
+  const { camera, handleMouseMove, handleWheel } = useCamera(onCameraChange);
+
+  // Derive links from nodes using useMemo (avoids setState in useEffect)
+  const links = useMemo((): Link[] => {
+    if (nodes.length === 0) return [];
+
+    const nodeMap = new Map(nodes.map(n => [n.id, n]));
+
+    return GRAPH_DATA.links
+      .filter(l => nodeMap.has(l.source) && nodeMap.has(l.target))
+      .map(l => {
+        const sourceNode = nodeMap.get(l.source);
+        const targetNode = nodeMap.get(l.target);
+
+        if (!sourceNode || !targetNode) return null;
+        if (sourceNode.x === undefined || sourceNode.y === undefined || sourceNode.z === undefined ||
+            targetNode.x === undefined || targetNode.y === undefined || targetNode.z === undefined) {
+          return null;
+        }
+
+        return { ...l, source: sourceNode, target: targetNode };
+      })
+      .filter((l): l is NonNullable<typeof l> => l !== null) as Link[];
+  }, [nodes]);
+
   // Physics hook
   const { physicsPaused: internalPaused, updatePhysics, reqRef } = usePhysics(nodes, links, externalPaused);
   const physicsPaused = internalPaused || externalPaused;
@@ -186,7 +199,7 @@ const initialNodes = filteredNodes.map(n => {
         })
         .filter((l): l is NonNullable<typeof l> => l !== null);
 
-      // Calculate node degrees
+      // Calculate node degrees based on initial links
       initialLinks.forEach(l => {
         const s = typeof l.source === 'object' ? l.source : null;
         const t = typeof l.target === 'object' ? l.target : null;
@@ -195,7 +208,6 @@ const initialNodes = filteredNodes.map(n => {
       });
 
       setNodes(initialNodes);
-      setLinks(initialLinks as Link[]);
       setIsInitializing(false);
       setTimeout(() => setPhysicsStabilized(true), 2000);
     }, 100);
@@ -205,46 +217,6 @@ const initialNodes = filteredNodes.map(n => {
       clearTimeout(initTimer);
     };
   }, [visibleGroups]);
-
-  // Recreate links from GRAPH_DATA whenever nodes change to ensure they reference current node objects
-  // This is critical because physics updates create new node objects, breaking old references
-  useEffect(() => {
-    if (nodes.length === 0) return;
-    
-    // Create a map for O(1) node lookup
-    const nodeMap = new Map(nodes.map(n => [n.id, n]));
-    
-    // Recreate all links from GRAPH_DATA, referencing current node objects
-    const updatedLinks = GRAPH_DATA.links
-      .filter(l => {
-        // Only include links where both nodes exist in current nodes array
-        return nodeMap.has(l.source) && nodeMap.has(l.target);
-      })
-      .map(l => {
-        const sourceNode = nodeMap.get(l.source);
-        const targetNode = nodeMap.get(l.target);
-        
-        if (!sourceNode || !targetNode) return null;
-        
-        // Verify nodes have valid positions
-        if (sourceNode.x === undefined || sourceNode.y === undefined || sourceNode.z === undefined ||
-            targetNode.x === undefined || targetNode.y === undefined || targetNode.z === undefined) {
-          return null;
-        }
-        
-        return {
-          ...l,
-          source: sourceNode,
-          target: targetNode
-        };
-      })
-      .filter((l): l is NonNullable<typeof l> => l !== null) as Link[];
-    
-    // Update links state if we have valid links
-    if (updatedLinks.length > 0) {
-      setLinks(updatedLinks);
-    }
-  }, [nodes]);
 
   // Start physics simulation
   useEffect(() => {
@@ -429,7 +401,7 @@ const initialNodes = filteredNodes.map(n => {
         <div className="absolute inset-0 z-50 bg-background flex items-center justify-center">
           <div className="text-center">
             <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-            <p className="text-sm text-muted">Initializing neural graph...</p>
+            <p className="text-sm text-muted">Inicializando grafo neural...</p>
           </div>
         </div>
       )}
@@ -437,7 +409,7 @@ const initialNodes = filteredNodes.map(n => {
       {!isInitializing && !physicsStabilized && (
         <div className="absolute top-4 right-4 z-40 bg-background/90 backdrop-blur-sm border border-border rounded-lg px-3 py-2 flex items-center gap-2">
           <div className="w-2 h-2 bg-primary rounded-full animate-pulse"></div>
-          <span className="text-xs font-mono text-muted">Stabilizing...</span>
+          <span className="text-xs font-mono text-muted">Estabilizando...</span>
         </div>
       )}
 
@@ -669,7 +641,7 @@ const initialNodes = filteredNodes.map(n => {
                   role="button"
                   aria-label={`Node: ${n.label}. ${n.desc || ''}`}
                   tabIndex={isFocused ? 0 : -1}
-                  aria-selected={isFocused}
+                  aria-pressed={isSelected}
                   onKeyDown={(e) => {
                     if (e.key === 'Enter' || e.key === ' ') {
                       e.preventDefault();
@@ -838,22 +810,22 @@ const initialNodes = filteredNodes.map(n => {
                         <p className="text-xs text-gray-300">{n.desc}</p>
                         {n.group === 'target' && (
                           <p className="text-xs text-green-400 mt-2 font-semibold">
-                            ✓ Complementary to o9 Solutions
+                            ✓ Complementar às Soluções o9
                           </p>
                         )}
                         {n.group === 'os' && (
                           <p className="text-xs text-blue-400 mt-2 font-semibold">
-                            → Enables o9 to deliver ROI
+                            → Habilita o o9 a entregar ROI
                           </p>
                         )}
                         {n.group === 'source' && (
                           <p className="text-xs text-orange-400 mt-2 font-semibold">
-                            📥 Data source for Foundry integration
+                            📥 Fonte de dados para integração Foundry
                           </p>
                         )}
                         {n.group === 'aip' && (
                           <p className="text-xs text-purple-400 mt-2 font-semibold">
-                            🤖 AI capabilities enhancing o9
+                            🤖 Capacidades de IA aprimorando o9
                           </p>
                         )}
                       </div>

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { Send, Loader2, Bookmark } from 'lucide-react';
+import { Send, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Card } from '@/components/ui/Card';
@@ -84,20 +84,21 @@ export function ChatInterface({ onSaveToNotebook }: ChatInterfaceProps) {
           citations.push(...chunk.citations);
         }
 
-        setMessages(prev => prev.map(msg => 
-          msg.id === assistantMessageId 
+        setMessages(prev => prev.map(msg =>
+          msg.id === assistantMessageId
             ? { ...msg, content: fullContent, citations: [...new Set(citations)] }
             : msg
         ));
       }
-    } catch (error: any) {
-      if (error.name === 'AbortError') {
+    } catch (error: unknown) {
+      const err = error as Error & { name?: string };
+      if (err.name === 'AbortError') {
         return;
       }
-      console.error('Chat error:', error);
-      setMessages(prev => prev.map(msg => 
-        msg.id === assistantMessageId 
-          ? { ...msg, content: `**Error:** ${error.message || 'Failed to get response'}` }
+      console.error('Erro no chat:', error);
+      setMessages(prev => prev.map(msg =>
+        msg.id === assistantMessageId
+          ? { ...msg, content: `**Erro:** ${err.message || 'Falha ao obter resposta'}` }
           : msg
       ));
     } finally {
@@ -134,16 +135,16 @@ export function ChatInterface({ onSaveToNotebook }: ChatInterfaceProps) {
         {messages.length === 0 && (
           <div className="h-full flex items-center justify-center">
             <Card className="p-8 max-w-md text-center">
-              <h3 className="text-lg font-semibold mb-2">AI Assistant</h3>
+              <h3 className="text-lg font-semibold mb-2">Assistente de IA</h3>
               <p className="text-sm text-muted mb-4">
-                Ask questions about Palantir Foundry, the Ontology, AIP, or any concept in the knowledge graph.
+                Faça perguntas sobre Palantir Foundry, a Ontology, AIP, ou qualquer conceito no grafo de conhecimento.
               </p>
               <div className="text-xs text-muted space-y-1">
-                <p>Example queries:</p>
+                <p>Exemplos de consultas:</p>
                 <ul className="list-disc list-inside space-y-1">
-                  <li>"What is Palantir's Ontology?"</li>
-                  <li>"How do I create a data pipeline?"</li>
-                  <li>"Explain AIP Logic and tool use"</li>
+                  <li>&quot;O que é a Ontology do Palantir?&quot;</li>
+                  <li>&quot;Como criar um pipeline de dados?&quot;</li>
+                  <li>&quot;Explique AIP Logic e uso de ferramentas&quot;</li>
                 </ul>
               </div>
             </Card>
@@ -161,7 +162,7 @@ export function ChatInterface({ onSaveToNotebook }: ChatInterfaceProps) {
         {isStreaming && (
           <div className="flex items-center gap-2 text-muted text-sm">
             <Loader2 className="animate-spin" size={16} />
-            <span>Thinking...</span>
+            <span>Pensando...</span>
           </div>
         )}
 
@@ -175,7 +176,7 @@ export function ChatInterface({ onSaveToNotebook }: ChatInterfaceProps) {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyPress={handleKeyPress}
-            placeholder="Ask about Foundry, Ontology, AIP, or any concept..."
+            placeholder="Pergunte sobre Foundry, Ontology, AIP, ou qualquer conceito..."
             disabled={isStreaming}
             className="flex-1"
           />
@@ -184,11 +185,10 @@ export function ChatInterface({ onSaveToNotebook }: ChatInterfaceProps) {
             disabled={!input.trim() || isStreaming}
             icon={isStreaming ? Loader2 : Send}
           >
-            Send
+            Enviar
           </Button>
         </div>
       </div>
     </div>
   );
 }
-

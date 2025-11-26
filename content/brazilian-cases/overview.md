@@ -217,7 +217,7 @@ public generateRecommendation(context: BusinessContext): Recommendation {
     //
     // Output Configuration:
     //   - Return Type: Structured Recommendation
-    //   - Model: GPT-4 or Claude Sonnet
+    //   - Model: GPT-4 or similar LLM
     //   - Strategy: Chain of Thought for explainability
 
     return {

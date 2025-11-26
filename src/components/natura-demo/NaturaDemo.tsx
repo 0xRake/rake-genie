@@ -33,11 +33,11 @@ interface PhaseConfig {
 }
 
 const phaseConfigs: PhaseConfig[] = [
-  { id: 'explore', icon: <MapPin size={14} />, label: 'Explore', color: '#00A859' },
-  { id: 'investigate', icon: <Target size={14} />, label: 'Investigate', color: '#3b82f6' },
-  { id: 'resolve', icon: <GitMerge size={14} />, label: 'Resolve', color: '#8b5cf6' },
-  { id: 'optimize', icon: <TrendingUp size={14} />, label: 'Optimize', color: '#f59e0b' },
-  { id: 'complete', icon: <FileText size={14} />, label: 'Summary', color: '#22c55e' },
+  { id: 'explore', icon: <MapPin size={14} />, label: 'Explorar', color: '#00A859' },
+  { id: 'investigate', icon: <Target size={14} />, label: 'Investigar', color: '#3b82f6' },
+  { id: 'resolve', icon: <GitMerge size={14} />, label: 'Resolver', color: '#8b5cf6' },
+  { id: 'optimize', icon: <TrendingUp size={14} />, label: 'Otimizar', color: '#f59e0b' },
+  { id: 'complete', icon: <FileText size={14} />, label: 'Resumo', color: '#22c55e' },
 ];
 
 export function NaturaDemo() {
@@ -160,7 +160,7 @@ export function NaturaDemo() {
               )}
               <div className="flex items-center gap-1">
                 <Calendar size={11} />
-                <span>Day {simulatedDay}</span>
+                <span>Dia {simulatedDay}</span>
               </div>
               {metrics.valueOptimized > 0 && (
                 <div className="flex items-center gap-1 text-green-600 font-medium">
@@ -204,7 +204,7 @@ export function NaturaDemo() {
                   />
                   <div className="absolute right-0 top-full mt-1 z-50 w-56 rounded-lg border border-border bg-background shadow-lg py-1">
                     <div className="px-3 py-2 border-b border-border/50">
-                      <div className="text-[10px] text-muted-foreground uppercase tracking-wider">Switch Persona</div>
+                      <div className="text-[10px] text-muted-foreground uppercase tracking-wider">Trocar Persona</div>
                     </div>
                     {PERSONAS.map(persona => (
                       <button

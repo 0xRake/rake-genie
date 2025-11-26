@@ -14,14 +14,14 @@ import { InternalTab } from '@/components/tabs/InternalTab';
 import type { Tab } from '@/store/app-store';
 
 const tabs = [
-  { id: 'home', label: 'HOME', icon: Network },
-  { id: 'model', label: 'MODEL', icon: Layout },
-  { id: 'demo', label: 'DEMO', icon: Target },
+  { id: 'home', label: 'INÍCIO', icon: Network },
+  { id: 'model', label: 'MODELO', icon: Layout },
+  { id: 'demo', label: 'DEMONSTRAÇÃO', icon: Target },
   { id: 'natura-demo', label: 'NATURA', icon: Leaf },
   { id: 'erp-integration', label: 'ERP', icon: GitMerge },
-  { id: 'notebook', label: 'NOTEBOOK', icon: BookOpen },
-  { id: 'assistant', label: 'ASSISTANT', icon: Sparkles },
-  { id: 'internal', label: 'INTERNAL', icon: Lock },
+  { id: 'notebook', label: 'CADERNO', icon: BookOpen },
+  { id: 'assistant', label: 'ASSISTENTE', icon: Sparkles },
+  { id: 'internal', label: 'INTERNO', icon: Lock },
 ];
 
 export default function AppPage() {
@@ -36,8 +36,6 @@ export default function AppPage() {
             <span className="font-bold text-xs">I</span>
           </div>
           <span className="font-bold text-lg tracking-tight">Intelium</span>
-          <span className="text-muted">|</span>
-          <span className="text-muted">Rake Presentation Workflow</span>
         </div>
         
         <Tabs tabs={tabs} activeTab={activeTab} onTabChange={(tabId) => setActiveTab(tabId as Tab)} />

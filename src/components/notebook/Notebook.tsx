@@ -43,7 +43,7 @@ export function Notebook({ initialCells, onExport }: NotebookProps) {
         const parsed = JSON.parse(stored);
         setCells(parsed);
       } catch (e) {
-        console.error('Failed to load notebook:', e);
+        console.error('Falha ao carregar caderno:', e);
       }
     }
   }, []);
@@ -58,7 +58,7 @@ export function Notebook({ initialCells, onExport }: NotebookProps) {
     const newCell: NotebookCell = {
       id: `cell-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
       type,
-      content: type === 'markdown' ? '' : type === 'code' ? '// Write your code here\n' : '',
+      content: type === 'markdown' ? '' : type === 'code' ? '// Escreva seu código aqui\n' : '',
       language: type === 'code' ? 'javascript' : undefined,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
@@ -74,8 +74,8 @@ export function Notebook({ initialCells, onExport }: NotebookProps) {
   }, [cells]);
 
   const updateCell = useCallback((id: string, updates: Partial<NotebookCell>) => {
-    setCells(prev => prev.map(cell => 
-      cell.id === id 
+    setCells(prev => prev.map(cell =>
+      cell.id === id
         ? { ...cell, ...updates, updatedAt: new Date().toISOString() }
         : cell
     ));
@@ -109,9 +109,9 @@ export function Notebook({ initialCells, onExport }: NotebookProps) {
         case 'mermaid':
           return `\`\`\`mermaid\n${cell.content}\n\`\`\``;
         case 'query':
-          return `**Query:** ${cell.content}\n\n${cell.output ? `**Result:**\n\`\`\`\n${cell.output}\n\`\`\`` : ''}`;
+          return `**Consulta:** ${cell.content}\n\n${cell.output ? `**Resultado:**\n\`\`\`\n${cell.output}\n\`\`\`` : ''}`;
         case 'node-embed':
-          return `**Nodes:** ${cell.nodeIds?.join(', ')}\n\n${cell.content}`;
+          return `**Nós:** ${cell.nodeIds?.join(', ')}\n\n${cell.content}`;
         default:
           return '';
       }
@@ -125,14 +125,14 @@ export function Notebook({ initialCells, onExport }: NotebookProps) {
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `notebook-${new Date().toISOString().split('T')[0]}.md`;
+      a.download = `caderno-${new Date().toISOString().split('T')[0]}.md`;
       a.click();
       URL.revokeObjectURL(url);
     }
   }, [cells, onExport]);
 
   const clearNotebook = useCallback(() => {
-    if (confirm('Are you sure you want to clear all cells? This cannot be undone.')) {
+    if (confirm('Tem certeza que deseja limpar todas as células? Esta ação não pode ser desfeita.')) {
       setCells([]);
       if (typeof window !== 'undefined') {
         localStorage.removeItem(STORAGE_KEY);
@@ -179,7 +179,7 @@ export function Notebook({ initialCells, onExport }: NotebookProps) {
             icon={Plus}
             onClick={() => addCell('markdown')}
           >
-            Add Cell
+            Adicionar Célula
           </Button>
           <div className="h-6 w-px bg-border mx-2" />
           <Button
@@ -194,7 +194,7 @@ export function Notebook({ initialCells, onExport }: NotebookProps) {
             size="sm"
             onClick={() => addCell('code')}
           >
-            Code
+            Código
           </Button>
           <Button
             variant="ghost"
@@ -208,7 +208,7 @@ export function Notebook({ initialCells, onExport }: NotebookProps) {
             size="sm"
             onClick={() => addCell('query')}
           >
-            Query
+            Consulta
           </Button>
         </div>
         <div className="flex items-center gap-2">
@@ -218,7 +218,7 @@ export function Notebook({ initialCells, onExport }: NotebookProps) {
             icon={Download}
             onClick={handleExport}
           >
-            Export
+            Exportar
           </Button>
           <Button
             variant="ghost"
@@ -226,7 +226,7 @@ export function Notebook({ initialCells, onExport }: NotebookProps) {
             icon={Trash2}
             onClick={clearNotebook}
           >
-            Clear
+            Limpar
           </Button>
         </div>
       </div>
@@ -236,12 +236,12 @@ export function Notebook({ initialCells, onExport }: NotebookProps) {
         {cells.length === 0 && (
           <div className="h-full flex items-center justify-center">
             <div className="text-center">
-              <h3 className="text-lg font-semibold mb-2">Empty Notebook</h3>
+              <h3 className="text-lg font-semibold mb-2">Caderno Vazio</h3>
               <p className="text-sm text-muted mb-4">
-                Add cells to start taking notes, writing code, or creating diagrams.
+                Adicione células para começar a fazer anotações, escrever código ou criar diagramas.
               </p>
               <Button onClick={() => addCell('markdown')}>
-                Add Your First Cell
+                Adicionar Primeira Célula
               </Button>
             </div>
           </div>
@@ -251,4 +251,3 @@ export function Notebook({ initialCells, onExport }: NotebookProps) {
     </div>
   );
 }
-

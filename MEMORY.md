@@ -1,9 +1,9 @@
 # LIVING MEMORY FILE
 ## Rake Presentation Workflow - Continuous State
 
-**Last Updated:** Nov 26, 2025 - 3:30 AM - Session End
+**Last Updated:** Nov 26, 2025 - Afternoon
 **Build Status:** ✅ Successful | Dev Server: http://localhost:3001/app
-**Next Action:** Clear browser cache, test graph visualization
+**Language:** Portuguese (pt-BR) - Complete translation
 
 ---
 
@@ -16,45 +16,87 @@ npm run dev
 # Open: http://localhost:3001/app
 ```
 
-### Clear Browser Cache First!
-In browser console (F12):
-```javascript
-localStorage.removeItem('kg-camera');
-location.reload();
-```
-Then hard refresh: `Cmd+Shift+R` (Mac)
+### What to Test
+1. **All UI in Portuguese** - Tab labels, buttons, content
+2. **Natura Demo** (click "NATURA" tab)
+   - Select persona from header (Maria, Carlos, Ana)
+   - Click warehouse markers on map
+   - View actionable insights panel
+   - Resolve conflicts → decisions persist
+   - Execute scenario → see audit log
+   - Refresh page → decisions restored from localStorage
 
-### What to Verify
-- ✅ Background grid pattern visible
-- ✅ Center crosshair visible
-- ✅ 8 colored brain lobes with labels
-- ✅ 50+ nodes moving fluidly
-- ✅ Nodes settle into lobe clusters after 10-15 seconds
-- ✅ Camera pan/zoom works smoothly
+3. **Knowledge Graph** (INÍCIO tab)
+   - 8 brain lobes with labels
+   - 50+ nodes clustering
+   - Pan/zoom works
+   - Loading text in Portuguese
+
+4. **CADERNO** tab - Full notebook functionality
+5. **ASSISTENTE** tab - AI chat interface
 
 ---
 
 ## CURRENT SESSION CONTEXT
 
 ### What Was Just Completed (This Session)
-1. **StaticCortex.tsx REWRITTEN** - Now uses 3D projection with camera
-2. **useCamera.ts** - Camera: x:0, y:0, z:-700, fov:2000
-3. **usePhysics.ts** - Anchor strength: 0.006/0.003
-4. **NeuralGraph.tsx** - Passes camera prop to StaticCortex
-5. **Typo fixed** - `widow` → `window` in NeuralGraph.tsx
-6. **Caches cleared** - `.next/` and `node_modules/.cache/` deleted
-7. **Dev server running** - http://localhost:3001/app
 
-### What Still Needs Work (Priority Order)
-1. **Test the visualization** - Verify graph works after all changes
-2. Build Notebook with cell types (Markdown, Code, Mermaid, Query)
-3. Build Assistant chat interface with citations
-4. Create Model tab content
-5. Create Demo tab (Natura presentation)
+#### Full Portuguese Translation
+1. **Layout & Navigation**
+   - `layout.tsx` - `lang="pt-BR"`, metadata in Portuguese
+   - `page.tsx` - Tab labels: INÍCIO, MODELO, DEMONSTRAÇÃO, CADERNO, ASSISTENTE, INTERNO
+   - Header simplified to just "Intelium" logo
+
+2. **Knowledge Graph Bugs Fixed**
+   - `usePhysics.ts` - Fixed circular callback reference using `useRef`
+   - `graph-data.ts` - Replaced `React.ComponentType<any>` with typed `IconProps`
+   - `NeuralGraph.tsx` - Replaced `useState` for links with `useMemo` (avoids cascading renders)
+   - `NeuralGraph.tsx` - Replaced `aria-selected` with `aria-pressed` (accessibility fix)
+
+3. **Components Translated**
+   - `ModelTab.tsx` - All capabilities, architecture sections in PT
+   - `DemoTab.tsx` - Challenges, opportunities, roadmap in PT
+   - `NeuralGraph.tsx` - DemoMetrics, getGroupStory, tooltips, loading states
+   - `Notebook.tsx` - All buttons, labels, empty state messages
+   - `ChatInterface.tsx` - Assistant UI, placeholder, examples
+   - `NaturaDemo.tsx` - Phase labels, UI elements
+
+### Tab Labels (Portuguese)
+| English | Portuguese |
+|---------|-----------|
+| HOME | INÍCIO |
+| MODEL | MODELO |
+| DEMO | DEMONSTRAÇÃO |
+| NOTEBOOK | CADERNO |
+| ASSISTANT | ASSISTENTE |
+| INTERNAL | INTERNO |
 
 ---
 
-## CURRENT PHYSICS & CAMERA VALUES
+## KEY VALUES & CONFIGURATION
+
+### Language
+```typescript
+// layout.tsx
+<html lang="pt-BR" className="dark">
+
+// Metadata
+title: "Intelium"
+description: "Formato de documentação exploratória usando grafos de conhecimento de vias neurais"
+```
+
+### Natura Store (natura-store.ts)
+```typescript
+// Personas
+PERSONAS = [
+  { id: 'analyst', name: 'Maria Santos', role: 'Supply Chain Analyst' },
+  { id: 'manager', name: 'Carlos Silva', role: 'Warehouse Manager' },
+  { id: 'vp', name: 'Ana Oliveira', role: 'VP Operations' },
+];
+
+// LocalStorage key: 'natura-demo-session'
+// Persisted: decisions, currentPersona, simulatedDay, metrics, phase
+```
 
 ### Camera (useCamera.ts)
 ```typescript
@@ -64,62 +106,36 @@ DEFAULT_CAMERA = { x: 0, y: 0, z: -700, fov: 2000 }
 ### Physics (usePhysics.ts)
 ```typescript
 anchorStrength = isMasterNode ? 0.006 : 0.003;
-repulsionForce = 15000;
-repulsionRadius = 600 / 500;
-damping = 0.88;
-stabilization = 0.01;
+// Uses useRef for recursive callback to avoid circular reference
 ```
 
-### Initialization (NeuralGraph.tsx)
+### Links Derivation (NeuralGraph.tsx)
 ```typescript
-spread = 200;
-initialVelocity = 0;
+// Links are now derived from nodes using useMemo (not useState)
+const links = useMemo((): Link[] => {
+  if (nodes.length === 0) return [];
+  const nodeMap = new Map(nodes.map(n => [n.id, n]));
+  return GRAPH_DATA.links.filter(...).map(...);
+}, [nodes]);
 ```
 
-### StaticCortex.tsx - NEW
-- Uses `project3D()` with camera for lobe positioning
-- Shows all 8 group anchors as colored lobes
-- Background grid pattern
-- Center crosshair
-- Labels above each lobe
-- Moves with camera pan/zoom
-
 ---
 
-## KEY CHANGES THIS SESSION
+## FILES MODIFIED THIS SESSION
 
-### 1. StaticCortex Now Camera-Aware
-**Before:** Static screen-space positions (didn't move with pan/zoom)
-**After:** Uses 3D world coordinates + camera projection
+### Bug Fixes
+- `src/components/graph/hooks/usePhysics.ts` - Circular callback fix
+- `src/data/graph-data.ts` - IconProps type safety
+- `src/components/graph/NeuralGraph.tsx` - useMemo for links, aria-pressed, PT translations
 
-### 2. Camera Adjusted for Wide View
-**Before:** z:-600, fov:1000
-**After:** z:-700, fov:2000 (sees ±350 unit anchors)
-
-### 3. Physics Reduced
-**Before:** anchorStrength 0.008/0.005
-**After:** anchorStrength 0.006/0.003 (gentler, less snappy)
-
-### 4. All Lobes Now Visible
-StaticCortex shows all 8 groups:
-- os (center), aip (top), ontology (right), data (left)
-- app (bottom), target, source, strategy
-
----
-
-## USER FEEDBACK LOG
-
-### Feedback Received
-1. "Skeleton at BEST" - Need more comprehensive implementation
-2. Plan is "too abstract and not detailed enough"
-3. Nodes clustering in upper-right corner
-4. Nodes flying apart (bounded physics overcompensated)
-5. StaticCortex lobes not aligned with nodes (fixed with camera projection)
-
-### How Addressed
-- Multiple physics iterations (too strong → too weak → balanced)
-- StaticCortex rewritten to use camera projection
-- Camera FOV widened to see all anchor positions
+### Portuguese Translations
+- `src/app/layout.tsx` - lang="pt-BR", metadata
+- `src/app/app/page.tsx` - Tab labels, simplified header
+- `src/components/tabs/ModelTab.tsx` - Full translation
+- `src/components/tabs/DemoTab.tsx` - Full translation
+- `src/components/notebook/Notebook.tsx` - Full translation
+- `src/components/assistant/ChatInterface.tsx` - Full translation
+- `src/components/natura-demo/NaturaDemo.tsx` - Phase labels translation
 
 ---
 
@@ -128,96 +144,61 @@ StaticCortex shows all 8 groups:
 ### Architecture Decisions
 | Decision | Reasoning | Date |
 |----------|-----------|------|
-| Fresh project in rake-genie | Clean slate without legacy issues | Current |
-| Intelium brand guide | Monochrome, professional, modern | Current |
-| 5-tab structure | HOME, MODEL, DEMO, NOTEBOOK, ASSISTANT | Current |
-| Zustand for state | Simple, lightweight, works with React 18 | Current |
-| Camera-aware StaticCortex | Lobes must align with nodes | Current |
-| Wide FOV (2000) | Anchors spread ±400 units, need to see all | Current |
-
----
-
-## DEPENDENCIES
-
-### External Dependencies
-```json
-{
-  "d3": "^7.x",
-  "mermaid": "^10.x",
-  "@uiw/react-codemirror": "^4.x",
-  "react-markdown": "^9.x",
-  "zustand": "^4.x",
-  "lucide-react": "^0.x",
-  "geist": "^1.x"
-}
-```
-
-### Internal Dependencies
-```
-NeuralGraph → usePhysics, useCamera, projectionUtils, StaticCortex, anchors
-StaticCortex → project3D, Camera, GROUP_ANCHORS
-Notebook → CodeMirror, Mermaid, react-markdown
-Assistant → Gemini API, Digital Twin, Citations
-```
+| useMemo for links | Avoids setState in useEffect cascading renders | Nov 26 |
+| useRef for physics callback | Fixes circular reference in recursive animation | Nov 26 |
+| aria-pressed over aria-selected | Correct ARIA for button role | Nov 26 |
+| IconProps interface | Type safety for Lucide icons | Nov 26 |
+| Keep product names in English | Consistency with Palantir documentation | Nov 26 |
+| pt-BR language attribute | Brazilian Portuguese localization | Nov 26 |
 
 ---
 
 ## KNOWN ISSUES
 
 ### Resolved This Session
-1. ✅ StaticCortex lobes misaligned - Fixed with camera projection
-2. ✅ `widow` typo - Fixed to `window`
-3. ✅ Camera too narrow - Widened FOV to 2000
+1. ✅ Circular callback reference in usePhysics.ts
+2. ✅ Unsafe `any` type in graph-data.ts
+3. ✅ setState in useEffect causing cascading renders
+4. ✅ Invalid aria-selected on button role
+5. ✅ All UI in English (now Portuguese)
 
 ### Active (Non-blocking)
-1. ⚠️ Lint warnings (unused vars) - cosmetic
-2. ⚠️ Notebook cells not yet implemented
-3. ⚠️ Assistant chat interface not yet implemented
-4. ⚠️ Model/Demo tab content pending
+1. ⚠️ Some lint warnings remain in erp-integration components
+2. ⚠️ Outcome timeline not in WasteOptimization execution
+3. ⚠️ Rule badges not added to ConflictResolution
 
 ---
 
-## CONTEXT FOR NEXT SESSION
+## GIT STATUS
 
-### Files Modified This Session
-- `src/components/graph/StaticCortex.tsx` - Complete rewrite
-- `src/components/graph/NeuralGraph.tsx` - Camera prop, typo fix
-- `src/components/graph/hooks/useCamera.ts` - z:-700, fov:2000
-- `src/components/graph/hooks/usePhysics.ts` - anchorStrength 0.006/0.003
-
-### Critical Files to Understand
-- `src/data/anchors.ts` - 8 group positions (±400 units spread)
-- `src/components/graph/utils/projectionUtils.ts` - project3D function
-- `src/data/graph-data.ts` - All 50+ nodes with groups
-- `src/lib/digital-twin.ts` - LLM grounding service
-
-### Commands
-```bash
-cd ~/Developer/rake-genie
-npm run dev     # Start dev server
-npm run build   # Build for production
+### Latest Commits
+```
+1ecbbaa feat: Add Natura ERP Integration Demo with full visualization suite
+3d31baf Initial commit from Create Next App
 ```
 
+### Uncommitted Changes
+- All translation and bug fix changes are uncommitted
+- Files ready for commit:
+  - `src/app/layout.tsx`
+  - `src/app/app/page.tsx`
+  - `src/components/graph/NeuralGraph.tsx`
+  - `src/components/graph/hooks/usePhysics.ts`
+  - `src/data/graph-data.ts`
+  - `src/components/tabs/ModelTab.tsx`
+  - `src/components/tabs/DemoTab.tsx`
+  - `src/components/notebook/Notebook.tsx`
+  - `src/components/assistant/ChatInterface.tsx`
+  - `src/components/natura-demo/NaturaDemo.tsx`
+
 ---
 
-## SUCCESS METRICS
+## COMMANDS
 
-### Build Success
-- [x] TypeScript compiles with no errors
-- [x] All dependencies resolve
-- [x] Routes work (/app)
-- [x] Graph renders with 50+ nodes
-- [x] Physics simulation runs at 30fps
-- [x] StaticCortex lobes align with camera
-- [ ] All 5 tabs render content (1/5 done)
-- [ ] Notebook supports all cell types
-- [ ] Assistant streams responses
-
-### UX Success
-- [x] User can explore graph intuitively
-- [x] Multi-select feels natural (shift+click)
-- [x] Pan/zoom camera controls work
-- [x] InsightPanel shows node details
-- [x] Background lobes visible
-- [ ] Notebook cells are editable
-- [ ] Chat responses stream smoothly
+```bash
+cd ~/Developer/rake-genie
+npm run dev      # Start dev server (http://localhost:3001/app)
+npm run build    # Build for production (✅ passes)
+npm run lint     # Check linting (some warnings remain)
+git status       # Check uncommitted changes
+```

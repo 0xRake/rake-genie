@@ -204,7 +204,7 @@ public correlateSecurityEvents(
     events: Array<SecurityEvent>,
     timeWindow: number // minutes
 ): CorrelationResult {
-    // AIP Logic Use LLM block
+    // AIP Logic Use AI block
     // System Prompt: "You are a cybersecurity analyst..."
     // Task: Analyze events for attack patterns
     // Tools: Query threat intelligence, Calculator

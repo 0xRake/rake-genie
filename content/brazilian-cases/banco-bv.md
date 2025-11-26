@@ -264,7 +264,7 @@ graph TB
 
 1. **Real-time Data**: Customer balance updates em <5 segundos de transacao
 2. **360 Degree View**: Todos produtos, transacoes, interacoes em um lugar
-3. **AIP Next Best Action**: LLM recomenda oferta/acao baseado em contexto
+3. **AIP Next Best Action**: IA recomenda oferta/acao baseado em contexto
 4. **Document Viewer**: Contratos, IDs, comprovantes (Media Sets)
 5. **Interaction History**: Call center logs, branch visits, app sessions
 
@@ -612,7 +612,7 @@ graph TB
 ### Q2 2025: AIP Expansion
 - Chatbot com RAG para customer service
 - Automated document processing (contratos, IDs)
-- LLM-powered collections scripts
+- AI-powered collections scripts
 
 ### Q3 2025: Advanced Analytics
 - Propensity models para upsell/cross-sell

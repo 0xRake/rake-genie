@@ -202,7 +202,7 @@ Todas empresas usam **AIP Logic** e **ML models** para enriquecer decisoes.
 ```typescript
 @Function()
 public generateRecommendation(context: BusinessContext): Recommendation {
-    // AIP Logic Use LLM Block
+    // AIP Logic Use AI Block
     //
     // System Prompt: "You are a domain expert in [DOMAIN]..."
     //
@@ -217,7 +217,7 @@ public generateRecommendation(context: BusinessContext): Recommendation {
     //
     // Output Configuration:
     //   - Return Type: Structured Recommendation
-    //   - Model: GPT-4 or similar LLM
+    //   - Model: AI Model
     //   - Strategy: Chain of Thought for explainability
 
     return {
@@ -462,7 +462,7 @@ Todas as tres empresas planejam:
 ### Q3-Q4 2025: AIP Expansion
 - RAG para document search (contratos, manuais, regulacoes)
 - Chatbots internos com acesso a Ontology
-- Automated report generation com LLMs
+- Automated report generation com IA
 
 ### 2026: Advanced Analytics
 - Causal inference models
@@ -535,7 +535,7 @@ Todas as tres empresas planejam:
 | **Workshop** | Dashboards operacionais | Control tower, Store mgmt | Customer service portal | Apps interativos |
 | **Quiver** | Embedded charts | Analytics dashboards | Embedded charts | Analytics avancado |
 | **TypeScript Functions** | Helper functions | Fulfillment optimization | Credit evaluation API | Logica de negocio |
-| **AIP Logic** | Event correlation | Intelligent routing | Next best action | LLM-powered decisions |
+| **AIP Logic** | Event correlation | Intelligent routing | Next best action | AI-powered decisions |
 | **Query Functions** | - | - | Credit API, Fraud API | External integrations |
 | **Data Connections** | 15 sources | 6 sources (SAP, IoT, etc) | 5 sources (Mainframe, etc) | System integration |
 | **Schedules** | Hourly compliance | Daily demand forecast | Real-time CDC | Orchestracao |

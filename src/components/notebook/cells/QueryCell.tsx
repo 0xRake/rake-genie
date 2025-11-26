@@ -5,7 +5,7 @@ import { X, ChevronUp, ChevronDown, Plus, Play } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { NotebookCell, CellType } from '../Notebook';
-import { callGemini } from '@/lib/gemini';
+import { callAI } from '@/lib/ai';
 
 interface QueryCellProps {
   cell: NotebookCell;
@@ -36,13 +36,14 @@ export function QueryCell({
 
   const executeQuery = async () => {
     if (!cell.content.trim()) return;
-    
+
     setIsExecuting(true);
     try {
-      const result = await callGemini(cell.content);
+      const result = await callAI(cell.content);
       onUpdate({ output: result, executed: true });
-    } catch (error: any) {
-      onUpdate({ output: `Error: ${error.message}`, executed: true });
+    } catch (error: unknown) {
+      const err = error as Error;
+      onUpdate({ output: `Erro: ${err.message}`, executed: true });
     } finally {
       setIsExecuting(false);
     }
@@ -68,7 +69,7 @@ export function QueryCell({
               onClick={onMoveDown}
             />
           )}
-          <span className="text-xs text-muted ml-2">Query</span>
+          <span className="text-xs text-muted ml-2">Consulta</span>
         </div>
         <div className="flex items-center gap-1">
           <Button
@@ -78,7 +79,7 @@ export function QueryCell({
             onClick={executeQuery}
             disabled={isExecuting || !cell.content.trim()}
           >
-            Run
+            Executar
           </Button>
           <Button
             variant="ghost"
@@ -100,12 +101,12 @@ export function QueryCell({
         onChange={(e) => handleContentChange(e.target.value)}
         onFocus={onSelect}
         className="w-full min-h-[100px] p-2 border border-border rounded bg-background text-foreground font-mono text-sm resize-y"
-        placeholder="Ask a question about Foundry, Ontology, or AIP..."
+        placeholder="Faça uma pergunta sobre Foundry, Ontology ou AIP..."
       />
 
       {cell.output && (
         <div className="mt-2 p-4 bg-secondary rounded">
-          <div className="text-xs text-muted mb-2">Response:</div>
+          <div className="text-xs text-muted mb-2">Resposta:</div>
           <div className="prose prose-sm max-w-none dark:prose-invert">
             <pre className="whitespace-pre-wrap text-sm">{cell.output}</pre>
           </div>
@@ -114,4 +115,3 @@ export function QueryCell({
     </Card>
   );
 }
-

@@ -5,7 +5,7 @@ import { Send, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Card } from '@/components/ui/Card';
-import { streamGemini } from '@/lib/gemini';
+import { streamAI } from '@/lib/ai';
 import { Message } from './Message';
 import { SessionManager } from './SessionManager';
 
@@ -74,7 +74,7 @@ export function ChatInterface({ onSaveToNotebook }: ChatInterfaceProps) {
       const citations: string[] = [];
 
       // Stream response
-      for await (const chunk of streamGemini(userMessage.content)) {
+      for await (const chunk of streamAI(userMessage.content)) {
         if (abortControllerRef.current.signal.aborted) {
           break;
         }

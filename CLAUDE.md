@@ -75,8 +75,8 @@ npm run lint         # Run linter
 |---------|------|
 | Graph data | `src/data/graph-data.ts` |
 | Anchors | `src/data/anchors.ts` |
-| LLM grounding | `src/lib/digital-twin.ts` |
-| AI client | `src/lib/gemini.ts` |
+| Digital Twin | `src/lib/digital-twin.ts` |
+| AI client | `src/lib/ai.ts` |
 | Global state | `src/store/app-store.ts` |
 | 3D projection | `src/components/graph/utils/projectionUtils.ts` |
 
@@ -134,7 +134,7 @@ const lobe2D = { x: screenWidth/2, y: screenHeight/2 } // ✗ won't align
 │     Camera-aware 3D projection                  │
 ├─────────────────────────────────────────────────┤
 │           DIGITAL TWIN SERVICE                  │
-│      (Ontology-grounded LLM context)            │
+│      (Ontology-grounded AI context)             │
 ├─────────────────────────────────────────────────┤
 │  graph-data + official-docs + citations         │
 └─────────────────────────────────────────────────┘

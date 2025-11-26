@@ -14,8 +14,8 @@
   - Backlink discovery (`getBacklinks`)
   - Citation registration for all queried nodes
 
-- [x] **Gemini API Client**
-  - `src/lib/gemini.ts` - Streaming and non-streaming support
+- [x] **AI API Client**
+  - `src/lib/ai.ts` - Streaming and non-streaming support
   - Digital Twin context integration
   - Citation tracking
 
@@ -103,7 +103,7 @@
 The foundation demonstrates:
 - ✅ Data layer with citations working
 - ✅ Digital Twin service enhanced
-- ✅ Gemini API client with streaming ready
+- ✅ AI API client with streaming ready
 - ✅ Graph utilities and hooks functional
 - ✅ Design system applied
 - ✅ App structure with tabs working

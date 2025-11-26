@@ -23,7 +23,7 @@
 - [x] Design system setup
 - [x] Data layer (graph-data, anchors, citations, official-docs)
 - [x] Digital Twin (citation tracking, backlinks)
-- [x] Gemini API client (streaming support)
+- [x] AI API client (streaming support)
 - [x] Graph utilities (projection, pathfinding, performance)
 - [x] Graph hooks (usePhysics, useCamera)
 

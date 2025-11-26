@@ -502,7 +502,7 @@ public optimizeFulfillment(
     order: ConsultoraOrder,
     customerLocation: GeoPoint
 ): FulfillmentPlan {
-    // AIP Logic Use LLM Block
+    // AIP Logic Use AI Block
     // System Prompt: "You are a supply chain optimization expert..."
     // Tools:
     //   - Query Objects: Get nearby stores with inventory
@@ -665,7 +665,7 @@ graph TB
 ### Q3 2025: AIP Expansion
 - RAG para product recommendation chatbot
 - Consultora virtual assistant (WhatsApp integration)
-- Automated ESG report generation com LLMs
+- Automated ESG report generation com IA
 
 ### Q4 2025: International Expansion
 - Replica para operacoes Argentina, Chile, Colombia, Mexico

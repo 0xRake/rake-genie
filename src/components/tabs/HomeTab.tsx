@@ -45,9 +45,9 @@ export function HomeTab() {
   }, [selectedNodes, setSelectedNodes]);
 
   const handleGenerateInsight = useCallback(async (prompt: string, contextNodes?: string[]): Promise<string> => {
-    // Import Gemini API dynamically to avoid SSR issues
-    const { callGemini } = await import('@/lib/gemini');
-    return callGemini(prompt, 2, contextNodes);
+    // Import AI API dynamically to avoid SSR issues
+    const { callAI } = await import('@/lib/ai');
+    return callAI(prompt, 2, contextNodes);
   }, []);
 
   const handleSaveNote = useCallback((content: string) => {

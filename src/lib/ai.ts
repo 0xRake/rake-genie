@@ -1,16 +1,16 @@
 /**
- * Gemini API Client with Streaming Support
+ * AI Client with Streaming Support
  * Enhanced with Digital Twin context and citation tracking
  */
 
 import { queryDigitalTwin } from './digital-twin';
-import { registerCitation, getCitation } from '@/data/citations';
 
-const apiKey = process.env.NEXT_PUBLIC_GEMINI_API_KEY || "";
+const apiKey = process.env.NEXT_PUBLIC_AI_API_KEY || "";
 const MODEL_NAME = "gemini-2.5-flash-preview-09-2025";
+const API_BASE = "https://generativelanguage.googleapis.com/v1beta/models";
 
 const STRATEGIC_SYSTEM_PROMPT = `
-ROLE: You are a Senior Forward Deployed Engineer (FDE) and Strategic Advisor for Palantir Technologies. 
+ROLE: You are a Senior Forward Deployed Engineer (FDE) and Strategic Advisor for Palantir Technologies.
 
 YOUR MISSION: Translate complex Ontology concepts into kinetic operational realities. Do not just describe features; explain their "Wedge" value and operational utility.
 
@@ -18,7 +18,7 @@ CORE DOCTRINE:
 
 1. ONTOLOGY IS THE API: The Ontology decouples the data integration layer from the application layer. It maps "tables" to "things" (Objects).
 
-2. AIP IS NOT A CHATBOT: AIP allows LLMs to "tool use" the Ontology. It binds generative AI to deterministic functions and write-back actions.
+2. AIP IS NOT A CHATBOT: AIP allows models to "tool use" the Ontology. It binds generative AI to deterministic functions and write-back actions.
 
 3. SOFTWARE-DEFINED DATA INTEGRATION (SDDI): Pipeline Builder and Data Connection provide the substrate. We don't just store data; we model it.
 
@@ -45,9 +45,9 @@ export interface StreamChunk {
 }
 
 /**
- * Call Gemini API with Digital Twin context (non-streaming)
+ * Call AI API with Digital Twin context (non-streaming)
  */
-export async function callGemini(
+export async function callAI(
   userPrompt: string,
   retries = 2,
   contextNodes?: string[]
@@ -55,7 +55,7 @@ export async function callGemini(
   // Query Digital Twin for context if nodes are provided
   let digitalTwinContext = '';
   const citations: string[] = [];
-  
+
   if (contextNodes && contextNodes.length > 0) {
     const twinResult = queryDigitalTwin({ nodeIds: contextNodes });
     digitalTwinContext = `\n\nDIGITAL TWIN CONTEXT:\n${twinResult.context}\n`;
@@ -65,12 +65,12 @@ export async function callGemini(
   const enhancedPrompt = userPrompt + digitalTwinContext;
 
   if (!apiKey) {
-    return "## Simulation Mode\n\n**Analysis:**\nAccessing secure enclave...\n\n**Strategic Output:**\nThis is a simulated response. To activate real-time FDE intelligence, please configure a valid API Key.\n\n**Action Plan:**\n1. Review Ontology.\n2. Deploy Pipeline.\n3. Execute Action.";
+    return "## Modo Simulação\n\n**Análise:**\nAcessando enclave seguro...\n\n**Saída Estratégica:**\nEsta é uma resposta simulada. Para ativar a inteligência FDE em tempo real, configure uma chave de API válida.\n\n**Plano de Ação:**\n1. Revisar Ontology.\n2. Implantar Pipeline.\n3. Executar Action.";
   }
 
   try {
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/${MODEL_NAME}:generateContent?key=${apiKey}`,
+      `${API_BASE}/${MODEL_NAME}:generateContent?key=${apiKey}`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -83,41 +83,42 @@ export async function callGemini(
 
     if (!response.ok) {
       const errorText = await response.text();
-      throw new Error(`API call failed: ${response.status} ${response.statusText}. ${errorText}`);
+      throw new Error(`Chamada API falhou: ${response.status} ${response.statusText}. ${errorText}`);
     }
 
     const data = await response.json();
     const result = data.candidates?.[0]?.content?.parts?.[0]?.text;
 
     if (!result) {
-      throw new Error("No response generated from API");
+      throw new Error("Nenhuma resposta gerada pela API");
     }
 
     return result;
-  } catch (error: any) {
-    console.error('Gemini API Error:', error);
+  } catch (error: unknown) {
+    const err = error as Error;
+    console.error('Erro na API:', err);
 
     // Retry logic for network errors
-    if (retries > 0 && (error.message?.includes('fetch') || error.message?.includes('network'))) {
+    if (retries > 0 && (err.message?.includes('fetch') || err.message?.includes('network'))) {
       await new Promise(resolve => setTimeout(resolve, 1000 * (3 - retries)));
-      return callGemini(userPrompt, retries - 1, contextNodes);
+      return callAI(userPrompt, retries - 1, contextNodes);
     }
 
-    return `**Error:** ${error.message || 'An unexpected error occurred. Please try again.'}`;
+    return `**Erro:** ${err.message || 'Ocorreu um erro inesperado. Por favor, tente novamente.'}`;
   }
 }
 
 /**
- * Stream Gemini API response with Digital Twin context
+ * Stream AI API response with Digital Twin context
  */
-export async function* streamGemini(
+export async function* streamAI(
   userPrompt: string,
   contextNodes?: string[]
 ): AsyncGenerator<StreamChunk, void, unknown> {
   // Query Digital Twin for context if nodes are provided
   let digitalTwinContext = '';
   const citations: string[] = [];
-  
+
   if (contextNodes && contextNodes.length > 0) {
     const twinResult = queryDigitalTwin({ nodeIds: contextNodes });
     digitalTwinContext = `\n\nDIGITAL TWIN CONTEXT:\n${twinResult.context}\n`;
@@ -127,13 +128,13 @@ export async function* streamGemini(
   const enhancedPrompt = userPrompt + digitalTwinContext;
 
   if (!apiKey) {
-    yield { text: "## Simulation Mode\n\nThis is a simulated response.", done: true, citations };
+    yield { text: "## Modo Simulação\n\nEsta é uma resposta simulada.", done: true, citations };
     return;
   }
 
   try {
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/${MODEL_NAME}:streamGenerateContent?key=${apiKey}`,
+      `${API_BASE}/${MODEL_NAME}:streamGenerateContent?key=${apiKey}`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -145,14 +146,14 @@ export async function* streamGemini(
     );
 
     if (!response.ok) {
-      throw new Error(`API call failed: ${response.status}`);
+      throw new Error(`Chamada API falhou: ${response.status}`);
     }
 
     const reader = response.body?.getReader();
     const decoder = new TextDecoder();
 
     if (!reader) {
-      throw new Error("No response body");
+      throw new Error("Sem corpo de resposta");
     }
 
     let buffer = '';
@@ -175,7 +176,7 @@ export async function* streamGemini(
               if (text) {
                 yield { text, done: false, citations };
               }
-            } catch (e) {
+            } catch {
               // Skip invalid JSON
             }
           }
@@ -184,8 +185,8 @@ export async function* streamGemini(
     }
 
     yield { text: '', done: true, citations };
-  } catch (error: any) {
-    yield { text: `**Error:** ${error.message}`, done: true, citations };
+  } catch (error: unknown) {
+    const err = error as Error;
+    yield { text: `**Erro:** ${err.message}`, done: true, citations };
   }
 }
-

@@ -99,8 +99,8 @@ export function simulateConflictOutcome(
   predictedImpact: number,
   confidence: number
 ): SimulatedOutcome {
-  // Higher confidence = less variance
-  const volatility = 0.2 * (1 - confidence);
+  // Higher confidence = less variance (kept for documentation)
+  const _volatility = 0.2 * (1 - confidence);
   const varianceFactor = 0.9 + Math.random() * 0.2 + (confidence * 0.05);
   const actualValue = Math.round(predictedImpact * varianceFactor);
   const variance = actualValue - predictedImpact;

@@ -12,6 +12,7 @@ export interface Node {
   vy?: number;
   vz?: number;
   degree?: number;
+  r?: number; // radius for master node detection
 }
 
 export interface Link {
@@ -51,7 +52,7 @@ export function usePhysics(_nodes: Node[], links: Link[], externalPaused: boolea
       // Anchor force (pull towards group anchors) - BASELINE values
       next.forEach(n => {
         const anchor = GROUP_ANCHORS[n.group as keyof typeof GROUP_ANCHORS] || { x: 0, y: 0, z: 0 };
-        const isMasterNode = (n as any).r >= 40;
+        const isMasterNode = (n.r ?? 0) >= 40;
         const anchorStrength = isMasterNode ? 0.006 : 0.003;
         n.vx = (n.vx || 0) + (anchor.x - n.x!) * anchorStrength;
         n.vy = (n.vy || 0) + (anchor.y - n.y!) * anchorStrength;
@@ -65,10 +66,8 @@ export function usePhysics(_nodes: Node[], links: Link[], externalPaused: boolea
           const dy = next[i].y! - next[j].y!;
           const dz = next[i].z! - next[j].z!;
           const distSq = dx*dx + dy*dy + dz*dz || 1;
-          const nodeI = next[i] as any;
-          const nodeJ = next[j] as any;
-          const isMasterI = nodeI.r >= 40;
-          const isMasterJ = nodeJ.r >= 40;
+          const isMasterI = (next[i].r ?? 0) >= 40;
+          const isMasterJ = (next[j].r ?? 0) >= 40;
           const repulsionRadius = (isMasterI || isMasterJ) ? 600 : 500;
           const repulsionStrength = (isMasterI && isMasterJ) ? 1.5 : (isMasterI || isMasterJ) ? 1.2 : 0.5;
           

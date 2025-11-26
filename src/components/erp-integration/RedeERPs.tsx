@@ -1,9 +1,9 @@
 'use client';
 
-import React, { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useMemo } from 'react';
 import { cn } from '@/lib/utils';
 import { sistemasERP, problemasQualidadeDados, type ERPSystem } from '@/data/erp-integration/sistemasERP';
-import { AlertTriangle, Database, TrendingDown, Clock, HelpCircle } from 'lucide-react';
+import { AlertTriangle, Database, TrendingDown, Clock } from 'lucide-react';
 
 interface RedeERPsProps {
   onERPHover?: (erp: ERPSystem | null) => void;
@@ -34,7 +34,7 @@ export function RedeERPs({
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    setMounted(true);
+    setMounted(true); // eslint-disable-line react-hooks/set-state-in-effect -- Mounting state is intentional
   }, []);
 
   const handleERPHover = (erp: ERPSystem | null) => {
@@ -42,17 +42,17 @@ export function RedeERPs({
     onERPHover?.(erp);
   };
 
-  // Generate data lines from ERPs to planning layer
-  const dataLines: DataLine[] = sistemasERP.map((erp, index) => ({
+  // Generate data lines from ERPs to planning layer (stable values based on index)
+  const dataLines: DataLine[] = useMemo(() => sistemasERP.map((erp, index) => ({
     id: erp.id,
     startX: 80 + index * 100,
     startY: 280,
     endX: 400,
     endY: 80,
     color: index % 2 === 0 ? '#FF6B6B' : '#FFA94D',
-    delay: Math.random() * 2000,
-    hasError: Math.random() > 0.5
-  }));
+    delay: (index * 300) % 2000,
+    hasError: index % 2 === 0
+  })), []);
 
   return (
     <div ref={containerRef} className={cn('relative w-full h-full min-h-[500px]', className)}>
@@ -153,7 +153,7 @@ export function RedeERPs({
               className="animate-pulse"
               style={{
                 animationDelay: `${line.delay}ms`,
-                animationDuration: `${2000 + Math.random() * 1000}ms`
+                animationDuration: `${2000 + (dataLines.indexOf(line) * 150)}ms`
               }}
             />
 

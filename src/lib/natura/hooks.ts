@@ -14,6 +14,7 @@ export function useAnimatedCounter(
   const [isAnimating, setIsAnimating] = useState(false);
   const startTimeRef = useRef<number | null>(null);
   const animationRef = useRef<number | null>(null);
+  const animateRef = useRef<((timestamp: number) => void) | null>(null);
 
   const animate = useCallback((timestamp: number) => {
     if (!startTimeRef.current) {
@@ -26,23 +27,28 @@ export function useAnimatedCounter(
     setValue(Math.floor(eased * targetValue));
 
     if (progress < 1) {
-      animationRef.current = requestAnimationFrame(animate);
+      animationRef.current = requestAnimationFrame((ts) => animateRef.current?.(ts));
     } else {
       setValue(targetValue);
       setIsAnimating(false);
     }
   }, [targetValue, duration]);
 
+  // Keep the ref updated with the latest callback
+  useEffect(() => {
+    animateRef.current = animate;
+  }, [animate]);
+
   const start = useCallback(() => {
     setValue(0);
     startTimeRef.current = null;
     setIsAnimating(true);
-    animationRef.current = requestAnimationFrame(animate);
-  }, [animate]);
+    animationRef.current = requestAnimationFrame((ts) => animateRef.current?.(ts));
+  }, []);
 
   useEffect(() => {
     if (startOnMount) {
-      start();
+      start(); // eslint-disable-line react-hooks/set-state-in-effect -- Starting animation on mount is intentional
     }
     return () => {
       if (animationRef.current) {
@@ -130,7 +136,7 @@ export function useAnimatedList<T>(
   }, [visibleCount, items.length, staggerDelay]);
 
   useEffect(() => {
-    setVisibleCount(0);
+    setVisibleCount(0); // eslint-disable-line react-hooks/set-state-in-effect -- Reset on items change is intentional
   }, [items]);
 
   return {
@@ -167,7 +173,7 @@ export function useTypewriter(
       }, speed);
       return () => clearTimeout(timeout);
     } else {
-      setIsComplete(true);
+      setIsComplete(true); // eslint-disable-line react-hooks/set-state-in-effect -- Completion logic is intentional
     }
   }, [displayText, text, speed, startOnMount]);
 

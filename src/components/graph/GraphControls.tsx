@@ -34,7 +34,7 @@ export function GraphControls({
   onResetView,
   visibleGroups,
   onToggleGroup,
-  isDarkMode = true,
+  isDarkMode: _isDarkMode = true,
 }: GraphControlsProps) {
   return (
     <Card className="absolute top-4 left-4 p-4 bg-background/95 backdrop-blur-sm border-border shadow-lg z-30 max-w-xs">

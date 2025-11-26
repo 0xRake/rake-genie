@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { Box } from 'lucide-react';
 import { GROUP_ANCHORS } from '@/data/anchors';
 import { GRAPH_DATA } from '@/data/graph-data';
@@ -527,7 +527,7 @@ const initialNodes = filteredNodes.map(n => {
             const sourceGroup = s.group;
             const targetGroup = t.group;
             const sourceColor = GROUP_COLORS_LIGHT[sourceGroup] || GROUP_COLORS_DARK[sourceGroup] || '#737373';
-            const targetColor = GROUP_COLORS_LIGHT[targetGroup] || GROUP_COLORS_DARK[targetGroup] || '#737373';
+            const _targetColor = GROUP_COLORS_LIGHT[targetGroup] || GROUP_COLORS_DARK[targetGroup] || '#737373';
             
             // Use source color for links, or blend if different groups
             const linkColor = sourceGroup === targetGroup 
@@ -589,7 +589,7 @@ const initialNodes = filteredNodes.map(n => {
           })}
           {projectedNodes
             .sort((a, b) => (b.node.z || 0) - (a.node.z || 0))
-            .map(({ node: n, projection: p }, i) => {
+            .map(({ node: n, projection: p }) => {
               const isSelected = selectedNodes.includes(n.id);
               const isHovered = hoveredNode === n.id;
               const isMasterNode = n.r >= 40; // Master nodes are larger

@@ -16,8 +16,7 @@ import {
   BarChart3,
   ArrowRight,
   Zap,
-  Target,
-  Calendar
+  Target
 } from 'lucide-react';
 
 interface PainelMetricasProps {

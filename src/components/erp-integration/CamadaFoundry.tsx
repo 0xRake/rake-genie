@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { cn } from '@/lib/utils';
 import { sistemasERP, objetosOntologia, type ERPSystem, type OntologyObject } from '@/data/erp-integration/sistemasERP';
-import { CheckCircle2, Zap, Database, Link2, TrendingUp } from 'lucide-react';
+import { CheckCircle2, TrendingUp } from 'lucide-react';
 
 interface CamadaFoundryProps {
   onERPHover?: (erp: ERPSystem | null) => void;
@@ -23,7 +23,7 @@ export function CamadaFoundry({
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    setMounted(true);
+    setMounted(true); // eslint-disable-line react-hooks/set-state-in-effect -- Mounting state is intentional
   }, []);
 
   const handleERPHover = (erp: ERPSystem | null) => {

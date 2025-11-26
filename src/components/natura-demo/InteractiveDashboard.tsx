@@ -11,7 +11,7 @@ import { ActionableInsights } from './ActionableInsights';
 import { ObjectExplorer } from './ObjectExplorer';
 import { QuickFilters } from './QuickFilters';
 import { useNaturaStore, useFilteredWarehouses } from '@/store/natura-store';
-import { inventoryData, Warehouse, InventoryItem } from '@/data/natura/inventory';
+import { Warehouse, InventoryItem } from '@/data/natura/inventory';
 import {
   formatBRLCompact,
   formatNumber,
@@ -56,17 +56,17 @@ export function InteractiveDashboard({
   const filteredWarehouses = useFilteredWarehouses();
   const [mounted, setMounted] = useState(false);
   const [hoveredSku, setHoveredSku] = useState<string | null>(null);
-  const [showInsights, setShowInsights] = useState(true);
+  const [, setShowInsights] = useState(true);
 
   useEffect(() => {
-    setMounted(true);
+    setMounted(true); // eslint-disable-line react-hooks/set-state-in-effect -- Mounting state is intentional
   }, []);
 
   const handleWarehouseSelect = useCallback((warehouse: Warehouse) => {
     setSelectedWarehouse(warehouse);
   }, [setSelectedWarehouse]);
 
-  const handleWarehouseHover = useCallback((warehouse: Warehouse | null) => {
+  const handleWarehouseHover = useCallback((_warehouse: Warehouse | null) => {
     // Could add hover state if needed
   }, []);
 
@@ -224,7 +224,7 @@ export function InteractiveDashboard({
                   { label: 'Total', value: selectedWarehouse.metrics.totalValue, color: 'default' as const },
                   { label: 'Excess', value: selectedWarehouse.metrics.excessValue, color: 'amber' as const },
                   { label: 'Risk', value: selectedWarehouse.metrics.stockoutRisk, color: 'red' as const }
-                ].map((stat, i) => (
+                ].map((stat) => (
                   <div
                     key={stat.label}
                     className={cn(
@@ -256,7 +256,7 @@ export function InteractiveDashboard({
                   </span>
                 </div>
                 <div className="space-y-2">
-                  {sortedInventory.map((item, index) => {
+                  {sortedInventory.map((item) => {
                     const isSelected = selectedSku?.sku === item.sku;
 
                     return (

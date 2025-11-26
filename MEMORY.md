@@ -1,15 +1,17 @@
 # LIVING MEMORY FILE
+
 ## Rake Presentation Workflow - Continuous State
 
-**Last Updated:** Nov 26, 2025 - Afternoon
+**Last Updated:** Nov 26, 2025 - Late Afternoon
 **Build Status:** ✅ Successful | Dev Server: http://localhost:3001/app
-**Language:** Portuguese (pt-BR) - Complete translation
+**Language:** Portuguese (pt-BR) - Complete
 
 ---
 
 ## 🔴 IMPORTANT: WHEN YOU WAKE UP
 
 ### Quick Start
+
 ```bash
 cd ~/Developer/rake-genie
 npm run dev
@@ -17,6 +19,7 @@ npm run dev
 ```
 
 ### What to Test
+
 1. **All UI in Portuguese** - Tab labels, buttons, content
 2. **Natura Demo** (click "NATURA" tab)
    - Select persona from header (Maria, Carlos, Ana)
@@ -42,6 +45,7 @@ npm run dev
 ### What Was Just Completed (This Session)
 
 #### Full Portuguese Translation
+
 1. **Layout & Navigation**
    - `layout.tsx` - `lang="pt-BR"`, metadata in Portuguese
    - `page.tsx` - Tab labels: INÍCIO, MODELO, DEMONSTRAÇÃO, CADERNO, ASSISTENTE, INTERNO
@@ -60,8 +64,16 @@ npm run dev
    - `Notebook.tsx` - All buttons, labels, empty state messages
    - `ChatInterface.tsx` - Assistant UI, placeholder, examples
    - `NaturaDemo.tsx` - Phase labels, UI elements
+   - `QueryCell.tsx` - Labels and placeholders in PT
+
+4. **AI References Removed**
+   - Renamed `gemini.ts` → `ai.ts`
+   - Functions: `callGemini` → `callAI`, `streamGemini` → `streamAI`
+   - Env var: `NEXT_PUBLIC_GEMINI_API_KEY` → `NEXT_PUBLIC_AI_API_KEY`
+   - All documentation cleaned of LLM/GPT/Gemini references
 
 ### Tab Labels (Portuguese)
+
 | English | Portuguese |
 |---------|-----------|
 | HOME | INÍCIO |
@@ -76,6 +88,7 @@ npm run dev
 ## KEY VALUES & CONFIGURATION
 
 ### Language
+
 ```typescript
 // layout.tsx
 <html lang="pt-BR" className="dark">
@@ -85,7 +98,16 @@ title: "Intelium"
 description: "Formato de documentação exploratória usando grafos de conhecimento de vias neurais"
 ```
 
+### AI Client
+
+```typescript
+// src/lib/ai.ts
+const apiKey = process.env.NEXT_PUBLIC_AI_API_KEY || "";
+// Functions: callAI(), streamAI()
+```
+
 ### Natura Store (natura-store.ts)
+
 ```typescript
 // Personas
 PERSONAS = [
@@ -95,21 +117,23 @@ PERSONAS = [
 ];
 
 // LocalStorage key: 'natura-demo-session'
-// Persisted: decisions, currentPersona, simulatedDay, metrics, phase
 ```
 
 ### Camera (useCamera.ts)
+
 ```typescript
 DEFAULT_CAMERA = { x: 0, y: 0, z: -700, fov: 2000 }
 ```
 
 ### Physics (usePhysics.ts)
+
 ```typescript
 anchorStrength = isMasterNode ? 0.006 : 0.003;
 // Uses useRef for recursive callback to avoid circular reference
 ```
 
 ### Links Derivation (NeuralGraph.tsx)
+
 ```typescript
 // Links are now derived from nodes using useMemo (not useState)
 const links = useMemo((): Link[] => {
@@ -124,24 +148,36 @@ const links = useMemo((): Link[] => {
 ## FILES MODIFIED THIS SESSION
 
 ### Bug Fixes
+
 - `src/components/graph/hooks/usePhysics.ts` - Circular callback fix
 - `src/data/graph-data.ts` - IconProps type safety
 - `src/components/graph/NeuralGraph.tsx` - useMemo for links, aria-pressed, PT translations
 
 ### Portuguese Translations
+
 - `src/app/layout.tsx` - lang="pt-BR", metadata
 - `src/app/app/page.tsx` - Tab labels, simplified header
 - `src/components/tabs/ModelTab.tsx` - Full translation
 - `src/components/tabs/DemoTab.tsx` - Full translation
 - `src/components/notebook/Notebook.tsx` - Full translation
+- `src/components/notebook/cells/QueryCell.tsx` - Full translation
 - `src/components/assistant/ChatInterface.tsx` - Full translation
 - `src/components/natura-demo/NaturaDemo.tsx` - Phase labels translation
+
+### AI Reference Cleanup
+
+- `src/lib/gemini.ts` → `src/lib/ai.ts` (renamed + refactored)
+- `src/components/assistant/ChatInterface.tsx` - Updated imports
+- `src/components/tabs/HomeTab.tsx` - Updated imports
+- `src/components/notebook/cells/QueryCell.tsx` - Updated imports
+- Documentation files cleaned
 
 ---
 
 ## DECISIONS MADE
 
 ### Architecture Decisions
+
 | Decision | Reasoning | Date |
 |----------|-----------|------|
 | useMemo for links | Avoids setState in useEffect cascading renders | Nov 26 |
@@ -150,19 +186,23 @@ const links = useMemo((): Link[] => {
 | IconProps interface | Type safety for Lucide icons | Nov 26 |
 | Keep product names in English | Consistency with Palantir documentation | Nov 26 |
 | pt-BR language attribute | Brazilian Portuguese localization | Nov 26 |
+| Remove AI provider references | No traceability to build tools | Nov 26 |
 
 ---
 
 ## KNOWN ISSUES
 
 ### Resolved This Session
+
 1. ✅ Circular callback reference in usePhysics.ts
 2. ✅ Unsafe `any` type in graph-data.ts
 3. ✅ setState in useEffect causing cascading renders
 4. ✅ Invalid aria-selected on button role
 5. ✅ All UI in English (now Portuguese)
+6. ✅ AI provider references (removed)
 
 ### Active (Non-blocking)
+
 1. ⚠️ Some lint warnings remain in erp-integration components
 2. ⚠️ Outcome timeline not in WasteOptimization execution
 3. ⚠️ Rule badges not added to ConflictResolution
@@ -172,24 +212,17 @@ const links = useMemo((): Link[] => {
 ## GIT STATUS
 
 ### Latest Commits
+
 ```
+0b1f25f refactor: Remove all AI/model provider references from codebase
+a2f370c feat: Translate entire app to Brazilian Portuguese + fix knowledge graph bugs
 1ecbbaa feat: Add Natura ERP Integration Demo with full visualization suite
 3d31baf Initial commit from Create Next App
 ```
 
-### Uncommitted Changes
-- All translation and bug fix changes are uncommitted
-- Files ready for commit:
-  - `src/app/layout.tsx`
-  - `src/app/app/page.tsx`
-  - `src/components/graph/NeuralGraph.tsx`
-  - `src/components/graph/hooks/usePhysics.ts`
-  - `src/data/graph-data.ts`
-  - `src/components/tabs/ModelTab.tsx`
-  - `src/components/tabs/DemoTab.tsx`
-  - `src/components/notebook/Notebook.tsx`
-  - `src/components/assistant/ChatInterface.tsx`
-  - `src/components/natura-demo/NaturaDemo.tsx`
+### Working Tree
+
+- Clean - no uncommitted changes
 
 ---
 

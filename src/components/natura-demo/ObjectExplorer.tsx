@@ -22,8 +22,7 @@ import {
   ArrowUpRight,
   Zap,
   Truck,
-  FileText,
-  Clock
+  FileText
 } from 'lucide-react';
 
 interface ObjectExplorerProps {
@@ -32,7 +31,7 @@ interface ObjectExplorerProps {
   onNavigateToOptimize?: () => void;
 }
 
-const objectTypeConfig: Record<LinkedObject['type'], {
+const _objectTypeConfig: Record<LinkedObject['type'], {
   icon: React.ReactNode;
   label: string;
   color: string;

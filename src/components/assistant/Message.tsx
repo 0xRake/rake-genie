@@ -22,7 +22,7 @@ export function Message({ message, onSaveToNotebook }: MessageProps) {
     const citationRegex = /\[(\d+)\]/g;
     const citations: Array<{ id: string; index: number; position: number }> = [];
     let match;
-    let offset = 0;
+    const offset = 0;
 
     while ((match = citationRegex.exec(text)) !== null) {
       const citationIndex = parseInt(match[1], 10);

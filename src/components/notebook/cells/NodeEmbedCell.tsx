@@ -20,7 +20,7 @@ interface NodeEmbedCellProps {
 
 export function NodeEmbedCell({
   cell,
-  onUpdate,
+  onUpdate: _onUpdate,
   onDelete,
   onMoveUp,
   onMoveDown,

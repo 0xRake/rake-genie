@@ -11,7 +11,6 @@ import {
   mockImpactMetrics
 } from '@/data/natura/optimization';
 import {
-  formatBRL,
   formatBRLCompact,
   formatNumber,
   formatDays,
@@ -33,7 +32,6 @@ import {
   Factory,
   Ban,
   Trophy,
-  ArrowRight,
   RefreshCw,
   FileText
 } from 'lucide-react';

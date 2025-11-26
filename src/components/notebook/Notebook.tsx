@@ -41,11 +41,12 @@ export function Notebook({ initialCells, onExport }: NotebookProps) {
     if (stored && cells.length === 0) {
       try {
         const parsed = JSON.parse(stored);
-        setCells(parsed);
+        setCells(parsed); // eslint-disable-line react-hooks/set-state-in-effect -- Loading from localStorage on mount is intentional
       } catch (e) {
         console.error('Falha ao carregar caderno:', e);
       }
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- Only run on mount
   }, []);
 
   // Auto-save to localStorage

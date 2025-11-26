@@ -75,7 +75,7 @@ export function ERPIntegrationDemo() {
   const [currentScene, setCurrentScene] = useState<DemoScene>('fragmentado');
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [interactionCount, setInteractionCount] = useState(0);
-  const [sessionStartTime] = useState(Date.now());
+  const [sessionStartTime] = useState(() => Date.now());
   const [elapsedTime, setElapsedTime] = useState(0);
   const [showSimulation, setShowSimulation] = useState(false);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
@@ -108,7 +108,7 @@ export function ERPIntegrationDemo() {
     setInteractionCount(prev => prev + 1);
   }, []);
 
-  const getCurrentSceneIndex = () => sceneConfigs.findIndex(s => s.id === currentScene);
+  const getCurrentSceneIndex = useCallback(() => sceneConfigs.findIndex(s => s.id === currentScene), [currentScene]);
   const currentSceneConfig = sceneConfigs.find(s => s.id === currentScene);
 
   const goToNextScene = useCallback(() => {

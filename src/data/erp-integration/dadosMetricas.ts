@@ -273,12 +273,3 @@ export const timelineIntegracao = {
   totalTradicional: 72,
   totalFoundry: 7
 };
-
-export default {
-  metricasComparacao,
-  metricasTecnicas,
-  simulacaoChoque,
-  kpiResumo,
-  dadosForecast,
-  timelineIntegracao
-};

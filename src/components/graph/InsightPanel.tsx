@@ -4,7 +4,6 @@ import React, { useState, useEffect } from 'react';
 import { X, BookOpen, Sparkles, Link2 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
-import { NeuralGraphNode } from './NeuralGraph';
 import { GraphNode } from '@/data/graph-data';
 import { getNodeConnections, findPathInDigitalTwin } from '@/lib/digital-twin';
 

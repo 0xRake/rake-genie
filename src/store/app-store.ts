@@ -1,5 +1,4 @@
 import { create } from 'zustand';
-import { GraphNode } from '@/data/graph-data';
 
 export type Tab = 'home' | 'model' | 'demo' | 'natura-demo' | 'erp-integration' | 'notebook' | 'assistant' | 'internal';
 

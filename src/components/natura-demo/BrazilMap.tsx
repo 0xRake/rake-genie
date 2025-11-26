@@ -89,7 +89,7 @@ export function BrazilMap({
   const [tooltipPos, setTooltipPos] = useState({ x: 0, y: 0 });
 
   useEffect(() => {
-    setMounted(true);
+    setMounted(true); // eslint-disable-line react-hooks/set-state-in-effect -- Mounting state is intentional
   }, []);
 
   const handleWarehouseClick = useCallback((warehouse: Warehouse) => {

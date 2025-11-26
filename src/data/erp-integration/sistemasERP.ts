@@ -312,10 +312,3 @@ export const problemasQualidadeDados = [
     exemplo: 'Campo fornecedor vazio em 15%'
   }
 ];
-
-export default {
-  sistemasERP,
-  objetosOntologia,
-  exemploRastreamentoSKU,
-  problemasQualidadeDados
-};

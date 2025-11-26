@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import { ReactNode } from 'react';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
@@ -16,33 +16,15 @@ import {
   CheckCircle2
 } from 'lucide-react';
 
-interface QuickFiltersProps {
-  className?: string;
-  compact?: boolean;
+interface FilterButtonProps {
+  active: boolean;
+  onClick: () => void;
+  children: ReactNode;
+  variant?: 'default' | 'danger' | 'warning' | 'success';
 }
 
-export function QuickFilters({ className, compact = false }: QuickFiltersProps) {
-  const { activeFilters, setFilter, clearFilters } = useNaturaStore();
-  const filteredWarehouses = useFilteredWarehouses();
-
-  const hasActiveFilters = Object.values(activeFilters).some(v => v !== null);
-
-  // Get unique values for each filter
-  const regions = [...new Set(inventoryData.warehouses.map(w => w.region))];
-  const brands = [...new Set(inventoryData.warehouses.map(w => w.brand))];
-  const statuses = ['stockout', 'excess', 'healthy'] as const;
-
-  const FilterButton = ({
-    active,
-    onClick,
-    children,
-    variant = 'default'
-  }: {
-    active: boolean;
-    onClick: () => void;
-    children: React.ReactNode;
-    variant?: 'default' | 'danger' | 'warning' | 'success';
-  }) => (
+function FilterButton({ active, onClick, children, variant = 'default' }: FilterButtonProps) {
+  return (
     <button
       onClick={onClick}
       className={cn(
@@ -62,6 +44,22 @@ export function QuickFilters({ className, compact = false }: QuickFiltersProps) 
       {children}
     </button>
   );
+}
+
+interface QuickFiltersProps {
+  className?: string;
+  compact?: boolean;
+}
+
+export function QuickFilters({ className, compact = false }: QuickFiltersProps) {
+  const { activeFilters, setFilter, clearFilters } = useNaturaStore();
+  const filteredWarehouses = useFilteredWarehouses();
+
+  const hasActiveFilters = Object.values(activeFilters).some(v => v !== null);
+
+  // Get unique values for each filter
+  const regions = [...new Set(inventoryData.warehouses.map(w => w.region))];
+  const brands = [...new Set(inventoryData.warehouses.map(w => w.brand))];
 
   if (compact) {
     return (

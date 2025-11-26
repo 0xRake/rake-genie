@@ -61,8 +61,9 @@ export function CodeCell({
       } else {
         onUpdate({ output: 'Execution not supported for this language', executed: true });
       }
-    } catch (error: any) {
-      onUpdate({ output: `Error: ${error.message}`, executed: true });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      onUpdate({ output: `Error: ${message}`, executed: true });
     } finally {
       setIsExecuting(false);
     }

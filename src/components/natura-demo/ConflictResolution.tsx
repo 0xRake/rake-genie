@@ -24,7 +24,6 @@ import {
   GitMerge,
   AlertCircle,
   CheckCircle2,
-  ChevronRight,
   Database,
   Sparkles,
   RefreshCw,

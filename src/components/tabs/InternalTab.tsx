@@ -18,7 +18,6 @@ import {
   Users,
   TrendingUp,
   Package,
-  MapPin,
   Lightbulb,
   FileText,
   MessageSquare
@@ -37,9 +36,9 @@ export function InternalTab() {
   useEffect(() => {
     const stored = sessionStorage.getItem(STORAGE_KEY);
     if (stored === 'true') {
-      setIsAuthenticated(true);
+      setIsAuthenticated(true); // eslint-disable-line react-hooks/set-state-in-effect -- Loading auth on mount
     }
-    setIsLoading(false);
+    setIsLoading(false); // eslint-disable-line react-hooks/set-state-in-effect -- Loading state on mount
   }, []);
 
   const handleSubmit = (e: React.FormEvent) => {

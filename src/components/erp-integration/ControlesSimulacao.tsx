@@ -25,14 +25,6 @@ interface ControlesSimulacaoProps {
 
 type SimulationState = 'idle' | 'running' | 'paused' | 'complete';
 
-interface TimelineEvent {
-  tempo: string;
-  acao: string;
-  status: 'erro' | 'alerta' | 'sucesso' | 'neutro';
-  completed: boolean;
-  active: boolean;
-}
-
 export function ControlesSimulacao({
   isOpen,
   onClose,
@@ -130,7 +122,7 @@ export function ControlesSimulacao({
   // Reset when closed
   useEffect(() => {
     if (!isOpen) {
-      resetSimulation();
+      resetSimulation(); // eslint-disable-line react-hooks/set-state-in-effect -- Reset on close is intentional
     }
   }, [isOpen, resetSimulation]);
 

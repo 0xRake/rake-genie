@@ -40,12 +40,12 @@ interface ExecutiveDashboardProps {
 
 export function ExecutiveDashboard({ onSKUSelect }: ExecutiveDashboardProps) {
   const [selectedWarehouse, setSelectedWarehouse] = useState<Warehouse | null>(null);
-  const [hoveredWarehouse, setHoveredWarehouse] = useState<Warehouse | null>(null);
+  const [, setHoveredWarehouse] = useState<Warehouse | null>(null);
   const [mounted, setMounted] = useState(false);
   const [hoveredSku, setHoveredSku] = useState<string | null>(null);
 
   useEffect(() => {
-    setMounted(true);
+    setMounted(true); // eslint-disable-line react-hooks/set-state-in-effect -- Mounting state is intentional
   }, []);
 
   const handleWarehouseSelect = useCallback((warehouse: Warehouse) => {

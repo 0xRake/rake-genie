@@ -94,7 +94,6 @@ export function ActionableInsights({ maxItems = 5, compact = false, className }:
       <div className={cn('space-y-2', className)}>
         {sortedInsights.map((insight) => {
           const config = insightConfig[insight.type];
-          const badge = severityBadge[insight.severity];
 
           return (
             <button

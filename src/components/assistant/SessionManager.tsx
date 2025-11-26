@@ -10,6 +10,12 @@ interface Session {
   createdAt: Date;
 }
 
+interface StoredSession {
+  id: string;
+  name: string;
+  createdAt: string;
+}
+
 interface SessionManagerProps {
   currentSessionId: string | null;
   onSessionChange: (sessionId: string | null) => void;
@@ -27,11 +33,12 @@ export function SessionManager({ currentSessionId, onSessionChange }: SessionMan
     const stored = localStorage.getItem(STORAGE_KEY);
     if (stored) {
       try {
-        const parsed = JSON.parse(stored).map((s: any) => ({
+        const storedSessions: StoredSession[] = JSON.parse(stored);
+        const parsed = storedSessions.map((s) => ({
           ...s,
           createdAt: new Date(s.createdAt),
         }));
-        setSessions(parsed);
+        setSessions(parsed); // eslint-disable-line react-hooks/set-state-in-effect -- Loading from localStorage on mount is intentional
       } catch (e) {
         console.error('Failed to load sessions:', e);
       }

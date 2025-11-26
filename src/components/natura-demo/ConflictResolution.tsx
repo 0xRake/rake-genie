@@ -5,6 +5,7 @@ import { cn } from '@/lib/utils';
 import { Card } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
+import { useNaturaStore } from '@/store/natura-store';
 import {
   conflictsData,
   Conflict,
@@ -64,8 +65,18 @@ export function ConflictResolution({
   initialSku,
   onBatchMergeComplete
 }: ConflictResolutionProps) {
+  const { resolveConflict: storeResolveConflict, incrementInteraction } = useNaturaStore();
   const [conflicts, setConflicts] = useState<Conflict[]>(conflictsData.conflicts);
-  const [selectedConflict, setSelectedConflict] = useState<Conflict | null>(null);
+  const [selectedConflict, setSelectedConflict] = useState<Conflict | null>(() => {
+    // Initialize with matching conflict or first pending
+    if (initialSku) {
+      const matching = conflictsData.conflicts.find(c =>
+        c.sources.some(s => s.sku.includes(initialSku.split('-').slice(1).join('-')))
+      );
+      if (matching) return matching;
+    }
+    return conflictsData.conflicts.filter(c => !c.resolved)[0] || null;
+  });
   const [statistics, setStatistics] = useState(conflictsData.statistics);
   const [merging, setMerging] = useState(false);
   const [batchMerging, setBatchMerging] = useState(false);
@@ -74,24 +85,9 @@ export function ConflictResolution({
   const [showBatchConfirm, setShowBatchConfirm] = useState(false);
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'info' } | null>(null);
 
-  // Select first conflict or one matching initialSku
-  useEffect(() => {
-    if (initialSku) {
-      const matchingConflict = conflicts.find(c =>
-        c.sources.some(s => s.sku.includes(initialSku.split('-').slice(1).join('-')))
-      );
-      if (matchingConflict) {
-        setSelectedConflict(matchingConflict);
-        return;
-      }
-    }
-    if (conflicts.length > 0 && !selectedConflict) {
-      setSelectedConflict(conflicts.filter(c => !c.resolved)[0]);
-    }
-  }, [initialSku, conflicts, selectedConflict]);
-
   const handleMerge = useCallback(async (conflict: Conflict) => {
     setMerging(true);
+    incrementInteraction();
 
     // Simulate merge animation
     await new Promise(resolve => setTimeout(resolve, 800));
@@ -110,10 +106,13 @@ export function ConflictResolution({
       resolved: prev.resolved + 1
     }));
 
+    // Update global store metrics
+    storeResolveConflict(conflict.id);
+
     setMerging(false);
     setToast({ message: `Golden Record created: ${conflict.goldenRecord.description}`, type: 'success' });
     setShowImpactModal(true);
-  }, [conflicts]);
+  }, [conflicts, incrementInteraction, storeResolveConflict]);
 
   const handleCloseImpactModal = useCallback(() => {
     setShowImpactModal(false);

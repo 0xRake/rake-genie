@@ -2,300 +2,294 @@
 
 import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { cn } from '@/lib/utils';
-import { Badge } from '@/components/ui/Badge';
-import { ExecutiveDashboard } from './ExecutiveDashboard';
+import { Button } from '@/components/ui/Button';
+import { useNaturaStore, DemoPhase, PERSONAS } from '@/store/natura-store';
+import { formatDuration, formatBRLCompact } from '@/lib/natura/formatting';
+
+import { InteractiveDashboard } from './InteractiveDashboard';
 import { ConflictResolution } from './ConflictResolution';
 import { WasteOptimization } from './WasteOptimization';
 import { ExecutiveSummary } from './ExecutiveSummary';
-import { Warehouse } from '@/data/natura/inventory';
-import { formatDuration } from '@/lib/natura/formatting';
+
 import {
   MapPin,
   GitMerge,
   TrendingUp,
   FileText,
-  ChevronRight,
-  Play,
   Clock,
   CheckCircle2,
-  Sparkles
+  RotateCcw,
+  Target,
+  ChevronDown,
+  Save,
+  Calendar
 } from 'lucide-react';
 
-export type DemoFlow = 'dashboard' | 'conflicts' | 'optimization' | 'complete';
-
-interface FlowStep {
-  id: DemoFlow;
-  label: string;
-  shortLabel: string;
+interface PhaseConfig {
+  id: DemoPhase;
   icon: React.ReactNode;
-  description: string;
+  label: string;
   color: string;
 }
 
-const flowSteps: FlowStep[] = [
-  {
-    id: 'dashboard',
-    label: 'Executive Dashboard',
-    shortLabel: 'Dashboard',
-    icon: <MapPin size={16} />,
-    description: 'Visualize inventory across Brazil',
-    color: '#00A859'
-  },
-  {
-    id: 'conflicts',
-    label: 'Conflict Resolution',
-    shortLabel: 'Conflicts',
-    icon: <GitMerge size={16} />,
-    description: 'Unify catalog with ML',
-    color: '#6366f1'
-  },
-  {
-    id: 'optimization',
-    label: 'Waste Optimization',
-    shortLabel: 'Optimize',
-    icon: <TrendingUp size={16} />,
-    description: 'Simulate transfer scenarios',
-    color: '#f59e0b'
-  },
-  {
-    id: 'complete',
-    label: 'Executive Summary',
-    shortLabel: 'Summary',
-    icon: <FileText size={16} />,
-    description: 'Generate report',
-    color: '#22c55e'
-  }
+const phaseConfigs: PhaseConfig[] = [
+  { id: 'explore', icon: <MapPin size={14} />, label: 'Explore', color: '#00A859' },
+  { id: 'investigate', icon: <Target size={14} />, label: 'Investigate', color: '#3b82f6' },
+  { id: 'resolve', icon: <GitMerge size={14} />, label: 'Resolve', color: '#8b5cf6' },
+  { id: 'optimize', icon: <TrendingUp size={14} />, label: 'Optimize', color: '#f59e0b' },
+  { id: 'complete', icon: <FileText size={14} />, label: 'Summary', color: '#22c55e' },
 ];
 
 export function NaturaDemo() {
-  const [currentFlow, setCurrentFlow] = useState<DemoFlow>('dashboard');
-  const [selectedSku, setSelectedSku] = useState<string | null>(null);
-  const [selectedWarehouse, setSelectedWarehouse] = useState<Warehouse | null>(null);
-  const [interactionCount, setInteractionCount] = useState(0);
-  const [sessionStartTime] = useState(Date.now());
+  const {
+    phase,
+    setPhase,
+    metrics,
+    sessionStartTime,
+    reset,
+    currentPersona,
+    setPersona,
+    decisions,
+    simulatedDay,
+  } = useNaturaStore();
+
   const [elapsedTime, setElapsedTime] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
+  const [showPersonaMenu, setShowPersonaMenu] = useState(false);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Update elapsed time every second
   useEffect(() => {
     timerRef.current = setInterval(() => {
       setElapsedTime(Math.floor((Date.now() - sessionStartTime) / 1000));
     }, 1000);
-
     return () => {
-      if (timerRef.current) {
-        clearInterval(timerRef.current);
-      }
+      if (timerRef.current) clearInterval(timerRef.current);
     };
   }, [sessionStartTime]);
 
-  const transitionTo = useCallback((flow: DemoFlow) => {
+  const transitionTo = useCallback((newPhase: DemoPhase) => {
     setIsTransitioning(true);
     setTimeout(() => {
-      setCurrentFlow(flow);
+      setPhase(newPhase);
       setTimeout(() => setIsTransitioning(false), 50);
-    }, 300);
-  }, []);
+    }, 150);
+  }, [setPhase]);
 
-  const handleSKUSelect = useCallback((sku: string, warehouse: Warehouse) => {
-    setSelectedSku(sku);
-    setSelectedWarehouse(warehouse);
-    setInteractionCount(prev => prev + 1);
-    transitionTo('conflicts');
-  }, [transitionTo]);
-
-  const handleBatchMergeComplete = useCallback(() => {
-    setInteractionCount(prev => prev + 1);
-    transitionTo('optimization');
-  }, [transitionTo]);
-
-  const handleScenarioExecuted = useCallback(() => {
-    setInteractionCount(prev => prev + 1);
-    transitionTo('complete');
-  }, [transitionTo]);
+  const handlePhaseClick = useCallback((targetPhase: DemoPhase) => {
+    const currentIndex = phaseConfigs.findIndex(p => p.id === phase);
+    const targetIndex = phaseConfigs.findIndex(p => p.id === targetPhase);
+    if (targetIndex <= currentIndex || targetPhase === 'explore') {
+      transitionTo(targetPhase);
+    }
+  }, [phase, transitionTo]);
 
   const handleRestart = useCallback(() => {
-    transitionTo('dashboard');
-    setSelectedSku(null);
-    setSelectedWarehouse(null);
-    setInteractionCount(0);
-  }, [transitionTo]);
+    reset();
+    setElapsedTime(0);
+  }, [reset]);
 
-  const navigateToFlow = useCallback((flow: DemoFlow) => {
-    const currentIndex = flowSteps.findIndex(s => s.id === currentFlow);
-    const targetIndex = flowSteps.findIndex(s => s.id === flow);
-
-    if (targetIndex <= currentIndex || flow === 'dashboard') {
-      transitionTo(flow);
-    }
-  }, [currentFlow, transitionTo]);
-
-  const getCurrentFlowIndex = () => flowSteps.findIndex(s => s.id === currentFlow);
-  const currentStep = flowSteps.find(s => s.id === currentFlow);
+  const getCurrentPhaseIndex = () => phaseConfigs.findIndex(p => p.id === phase);
 
   return (
-    <div className="h-full flex flex-col bg-gradient-to-br from-background via-background to-muted/20 overflow-hidden">
-      {/* Enhanced Header */}
-      <div className="flex-shrink-0 border-b border-border/50 bg-background/80 backdrop-blur-xl">
-        <div className="flex items-center justify-between px-6 py-3">
-          {/* Left: Logo and Title */}
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-3">
-              {/* Natura Logo */}
-              <div className="relative">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#00A859] to-[#00A859]/70 flex items-center justify-center shadow-lg shadow-[#00A859]/20">
-                  <span className="text-white font-bold text-lg">N</span>
-                </div>
-                <div className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-[#ED1164] border-2 border-background flex items-center justify-center">
-                  <span className="text-white text-[8px] font-bold">A</span>
-                </div>
+    <div className="h-full flex flex-col bg-background overflow-hidden">
+      {/* Streamlined Header */}
+      <header className="flex-shrink-0 border-b border-border/40 bg-background/95 backdrop-blur-sm">
+        <div className="flex items-center justify-between h-14 px-4">
+          {/* Left: Brand + Phase Nav */}
+          <div className="flex items-center gap-6">
+            {/* Compact Brand */}
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#00A859] to-[#00A859]/70 flex items-center justify-center">
+                <span className="text-white font-bold text-sm">N</span>
               </div>
-              <div>
-                <span className="font-bold text-lg">Natura & Co</span>
-                <div className="flex items-center gap-2">
-                  <Badge variant="default" className="text-xs bg-primary/10 text-primary border-primary/20">
-                    <Sparkles size={10} className="mr-1" />
-                    FOUNDRY DEMO
-                  </Badge>
-                </div>
+              <div className="hidden sm:block">
+                <span className="font-semibold text-sm">Natura & Co</span>
+                <span className="text-[10px] text-muted ml-2 px-1.5 py-0.5 rounded bg-primary/10 text-primary">
+                  FOUNDRY
+                </span>
               </div>
             </div>
 
-            {/* Flow Steps Navigation */}
-            <div className="flex items-center gap-1 ml-6 pl-6 border-l border-border/50">
-              {flowSteps.map((step, index) => {
-                const isActive = step.id === currentFlow;
-                const isCompleted = index < getCurrentFlowIndex();
-                const isClickable = isCompleted || step.id === 'dashboard';
+            {/* Phase Steps - Compact */}
+            <nav className="flex items-center">
+              {phaseConfigs.map((config, index) => {
+                const isActive = config.id === phase;
+                const isCompleted = index < getCurrentPhaseIndex();
+                const isClickable = isCompleted || config.id === 'explore';
 
                 return (
-                  <React.Fragment key={step.id}>
+                  <React.Fragment key={config.id}>
                     {index > 0 && (
                       <div className={cn(
-                        'w-8 h-0.5 mx-1 rounded-full transition-all duration-500',
+                        'w-4 h-px mx-1',
                         isCompleted ? 'bg-green-500' : 'bg-border'
                       )} />
                     )}
                     <button
-                      onClick={() => isClickable && navigateToFlow(step.id)}
-                      className={cn(
-                        'flex items-center gap-2 px-3 py-2 rounded-xl text-sm transition-all duration-300',
-                        'transform hover:scale-105',
-                        isActive
-                          ? 'bg-gradient-to-r text-white shadow-lg'
-                          : isCompleted
-                          ? 'bg-green-500/10 text-green-500 hover:bg-green-500/20'
-                          : 'text-muted hover:text-foreground hover:bg-muted/50',
-                        isClickable ? 'cursor-pointer' : 'cursor-default opacity-50'
-                      )}
-                      style={isActive ? {
-                        backgroundImage: `linear-gradient(135deg, ${step.color}, ${step.color}99)`
-                      } : undefined}
+                      onClick={() => handlePhaseClick(config.id)}
                       disabled={!isClickable}
-                    >
-                      {isCompleted ? (
-                        <CheckCircle2 size={16} className="text-green-500" />
-                      ) : (
-                        step.icon
+                      className={cn(
+                        'flex items-center gap-1 px-2 py-1 rounded-md text-xs transition-all',
+                        isActive
+                          ? 'bg-foreground text-background font-medium'
+                          : isCompleted
+                          ? 'text-green-600 hover:bg-green-500/10'
+                          : isClickable
+                          ? 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
+                          : 'text-muted-foreground/40 cursor-not-allowed'
                       )}
-                      <span className="hidden xl:inline font-medium">{step.shortLabel}</span>
+                    >
+                      {isCompleted ? <CheckCircle2 size={12} className="text-green-500" /> : config.icon}
+                      <span className="hidden md:inline">{config.label}</span>
                     </button>
                   </React.Fragment>
                 );
               })}
-            </div>
+            </nav>
           </div>
 
-          {/* Right: Session Metrics */}
-          <div className="flex items-center gap-6">
-            {/* Progress indicator */}
-            <div className="hidden lg:flex items-center gap-2 px-4 py-2 rounded-lg bg-muted/30">
-              <div className="text-xs text-muted">Progress</div>
-              <div className="flex gap-1">
-                {flowSteps.map((step, i) => (
-                  <div
-                    key={step.id}
-                    className={cn(
-                      'w-2 h-2 rounded-full transition-all duration-500',
-                      i <= getCurrentFlowIndex() ? 'bg-green-500' : 'bg-border'
-                    )}
-                  />
-                ))}
+          {/* Right: Metrics + Persona + Actions */}
+          <div className="flex items-center gap-3">
+            {/* Session Info - Compact */}
+            <div className="hidden lg:flex items-center gap-3 text-xs text-muted-foreground">
+              {decisions.length > 0 && (
+                <div className="flex items-center gap-1 text-green-600">
+                  <Save size={11} />
+                  <span>{decisions.length}</span>
+                </div>
+              )}
+              <div className="flex items-center gap-1">
+                <Calendar size={11} />
+                <span>Day {simulatedDay}</span>
               </div>
-              <div className="text-xs font-medium">{getCurrentFlowIndex() + 1}/4</div>
+              {metrics.valueOptimized > 0 && (
+                <div className="flex items-center gap-1 text-green-600 font-medium">
+                  <TrendingUp size={11} />
+                  <span>{formatBRLCompact(metrics.valueOptimized)}</span>
+                </div>
+              )}
             </div>
 
-            <div className="flex items-center gap-4 text-sm">
-              <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-muted/30">
-                <Clock size={14} className="text-muted" />
-                <span className="font-mono">{formatDuration(elapsedTime)}</span>
-              </div>
-              <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-primary/10">
-                <Play size={14} className="text-primary" />
-                <span className="font-medium text-primary">{interactionCount}</span>
-                <span className="text-muted hidden sm:inline">actions</span>
-              </div>
+            {/* Timer */}
+            <div className="flex items-center gap-1.5 px-2 py-1 rounded-md bg-muted/30 text-xs">
+              <Clock size={12} className="text-muted-foreground" />
+              <span className="font-mono tabular-nums">{formatDuration(elapsedTime)}</span>
             </div>
+
+            {/* Persona Selector */}
+            <div className="relative">
+              <button
+                onClick={() => setShowPersonaMenu(!showPersonaMenu)}
+                className={cn(
+                  'flex items-center gap-2 px-2 py-1 rounded-md text-xs transition-all',
+                  'hover:bg-muted/50 border border-transparent',
+                  showPersonaMenu && 'bg-muted/50 border-border'
+                )}
+              >
+                <div className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center text-[10px] font-medium text-primary">
+                  {currentPersona.avatar}
+                </div>
+                <span className="hidden sm:inline max-w-[80px] truncate">{currentPersona.name.split(' ')[0]}</span>
+                <ChevronDown size={12} className={cn(
+                  'text-muted-foreground transition-transform',
+                  showPersonaMenu && 'rotate-180'
+                )} />
+              </button>
+
+              {showPersonaMenu && (
+                <>
+                  <div
+                    className="fixed inset-0 z-40"
+                    onClick={() => setShowPersonaMenu(false)}
+                  />
+                  <div className="absolute right-0 top-full mt-1 z-50 w-56 rounded-lg border border-border bg-background shadow-lg py-1">
+                    <div className="px-3 py-2 border-b border-border/50">
+                      <div className="text-[10px] text-muted-foreground uppercase tracking-wider">Switch Persona</div>
+                    </div>
+                    {PERSONAS.map(persona => (
+                      <button
+                        key={persona.id}
+                        onClick={() => {
+                          setPersona(persona);
+                          setShowPersonaMenu(false);
+                        }}
+                        className={cn(
+                          'w-full flex items-center gap-3 px-3 py-2 text-left hover:bg-muted/50 transition-colors',
+                          currentPersona.id === persona.id && 'bg-primary/5'
+                        )}
+                      >
+                        <div className={cn(
+                          'w-8 h-8 rounded-full flex items-center justify-center text-xs font-medium',
+                          currentPersona.id === persona.id
+                            ? 'bg-primary text-primary-foreground'
+                            : 'bg-muted text-muted-foreground'
+                        )}>
+                          {persona.avatar}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="text-sm font-medium truncate">{persona.name}</div>
+                          <div className="text-[10px] text-muted-foreground truncate">{persona.role}</div>
+                        </div>
+                        {currentPersona.id === persona.id && (
+                          <CheckCircle2 size={14} className="text-primary shrink-0" />
+                        )}
+                      </button>
+                    ))}
+                  </div>
+                </>
+              )}
+            </div>
+
+            {/* Reset */}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleRestart}
+              className="h-7 w-7 p-0 text-muted-foreground hover:text-foreground"
+            >
+              <RotateCcw size={14} />
+            </Button>
           </div>
         </div>
 
-        {/* Contextual Message Bar */}
-        {currentFlow !== 'dashboard' && currentFlow !== 'complete' && (
-          <div className={cn(
-            'px-6 py-2 border-t border-border/30',
-            'bg-gradient-to-r from-transparent via-muted/20 to-transparent'
-          )}>
-            <div className="flex items-center gap-3 text-sm">
-              <div
-                className="w-2 h-2 rounded-full animate-pulse"
-                style={{ backgroundColor: currentStep?.color }}
-              />
-              {currentFlow === 'conflicts' && (
-                <span className="text-muted">
-                  Investigating why <span className="text-foreground font-medium">&apos;{selectedSku}&apos;</span> appears differently across ERPs.
-                  <span className="text-primary ml-2">Resolve conflicts to unify the catalog.</span>
-                </span>
-              )}
-              {currentFlow === 'optimization' && (
-                <span className="text-muted">
-                  Catalog unified. Now let&apos;s <span className="text-amber-500 font-medium">quantify waste</span> and
-                  <span className="text-green-500 font-medium"> simulate optimization scenarios</span>.
-                </span>
-              )}
-            </div>
-          </div>
-        )}
-      </div>
+        {/* Progress Bar */}
+        <div className="h-0.5 bg-muted/30">
+          <div
+            className="h-full bg-gradient-to-r from-primary to-primary/70 transition-all duration-500"
+            style={{ width: `${((getCurrentPhaseIndex() + 1) / phaseConfigs.length) * 100}%` }}
+          />
+        </div>
+      </header>
 
-      {/* Main Content Area with Transitions */}
-      <div className={cn(
-        'flex-1 overflow-hidden relative',
-        'transition-all duration-300',
-        isTransitioning ? 'opacity-0 scale-[0.98]' : 'opacity-100 scale-100'
+      {/* Main Content */}
+      <main className={cn(
+        'flex-1 overflow-hidden',
+        'transition-opacity duration-150',
+        isTransitioning ? 'opacity-0' : 'opacity-100'
       )}>
-        {currentFlow === 'dashboard' && (
-          <ExecutiveDashboard onSKUSelect={handleSKUSelect} />
-        )}
-        {currentFlow === 'conflicts' && (
-          <ConflictResolution
-            initialSku={selectedSku || undefined}
-            onBatchMergeComplete={handleBatchMergeComplete}
+        {(phase === 'explore' || phase === 'investigate') && (
+          <InteractiveDashboard
+            onNavigateToConflict={() => transitionTo('resolve')}
+            onNavigateToOptimize={() => transitionTo('optimize')}
           />
         )}
-        {currentFlow === 'optimization' && (
-          <WasteOptimization onScenarioExecuted={handleScenarioExecuted} />
+        {phase === 'resolve' && (
+          <ConflictResolution
+            onBatchMergeComplete={() => transitionTo('optimize')}
+          />
         )}
-        {currentFlow === 'complete' && (
+        {phase === 'optimize' && (
+          <WasteOptimization
+            onScenarioExecuted={() => transitionTo('complete')}
+          />
+        )}
+        {phase === 'complete' && (
           <ExecutiveSummary
             sessionDuration={elapsedTime}
             onRestart={handleRestart}
           />
         )}
-      </div>
-
-      {/* Bottom gradient fade */}
-      <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-background to-transparent pointer-events-none" />
+      </main>
     </div>
   );
 }
